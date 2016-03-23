@@ -56,9 +56,13 @@ void bt(Tablero t, int s) {
 								if(k != i && k != j && t.EstaVivo(k)){
 									double x_k = puntos[k].first;
 									double y_k = puntos[k].second;
-									double cociente_x = (x_k - x_i) / (x_j - x_i); 
-									double cociente_y = (y_k - y_i) / (y_j - y_i); 
-									if(cociente_x == cociente_y && mismo_cuadrante(puntos[i], puntos[j], puntos[k])) derrotados.push_back(k);
+									if(x_i != x_j && y_i != y_j){
+										double cociente_x = (x_k - x_i) / (x_j - x_i); 
+										double cociente_y = (y_k - y_i) / (y_j - y_i); 
+										if(cociente_x == cociente_y && mismo_cuadrante(puntos[i], puntos[j], puntos[k])) derrotados.push_back(k);
+									}else{
+										if(x_k == x_i || y_k == y_i) derrotados.push_back(k);
+									}
 								}
 							}
 							sucesor.Matar(derrotados);
