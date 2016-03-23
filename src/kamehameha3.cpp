@@ -30,7 +30,7 @@ void bt(Tablero t, int s) {
 			mejor = s;
 			mejor_sol = t.Solucion();
 		} else{
-			vector<pair<int, int> > puntos = t.Puntos();
+			vector<pair<int, int> > puntos = *(t.Puntos());
 			int n = puntos.size();
 
 			for(int i=0; i<n; i++){
@@ -72,7 +72,7 @@ void bt(Tablero t, int s) {
 }
 
 vector<vector<int> > solve(vector<pair<int, int> > puntos) {
-	Tablero inicial(puntos);
+	Tablero inicial(&puntos);
 	mejor = puntos.size();
 	bt(inicial, 0);
 

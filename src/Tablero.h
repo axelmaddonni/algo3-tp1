@@ -9,25 +9,24 @@ using namespace std;
 
 class Tablero {
 public:
-	Tablero(vector<pair<int, int> > p);
-	//Tablero(Tablero& t);
+	Tablero(vector<pair<int, int> > * p);
 	~Tablero();
 
 	bool EstaVivo(int androide);
 	void Matar(vector<int> androides);
-	vector<pair<int, int> > Puntos();
+	vector<pair<int, int> > * Puntos();
 	vector<vector<int> > Solucion();
 	bool Solucionado();
 	int Vivos();
 
 private:
-	vector<pair<int, int> > puntos;
+	vector<pair<int, int> > * puntos;
 	vector<vector<int> > solucion;
 	vector<int> vivos;
 	int cant_vivos;
 };
 
-Tablero::Tablero(vector<pair<int, int> > p): puntos(p), solucion(), vivos(p.size(), true), cant_vivos(p.size()) {}
+Tablero::Tablero(vector<pair<int, int> > * p): puntos(p), solucion(), vivos(p->size(), true), cant_vivos(p->size()) {}
 
 Tablero::~Tablero() {}
 
@@ -41,7 +40,7 @@ void Tablero::Matar(vector<int> androides){
 	cant_vivos -= androides.size();
 }
 
-vector<pair<int, int> > Tablero::Puntos(){
+vector<pair<int, int> > * Tablero::Puntos(){
 	return puntos;
 }
 
@@ -52,7 +51,7 @@ vector<vector<int> > Tablero::Solucion(){
 bool Tablero::Solucionado(){
 	int total = 0;
 	for(int i=0; i < solucion.size(); i++) total += solucion[i].size();
-	return total == puntos.size();
+	return total == puntos->size();
 }
 
 int Tablero::Vivos(){
