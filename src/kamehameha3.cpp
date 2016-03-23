@@ -24,65 +24,49 @@ bool mismo_cuadrante(pair<int, int> pi, pair<int, int> pj, pair<int, int> pk){
 	return false;
 }
 
-vector<Tablero> encontrar_sucesores(Tablero t) {
-	vector<Tablero> sucesores;
-	vector<pair<int, int> > puntos = t.Puntos();
-	int n = puntos.size();
-	bool unico_vivo = (t.Vivos() == 1);
+void bt(Tablero t, int s) {
+	if(s < mejor) { //El subarbol es aceptable
+		if(t.Solucionado()){
+			mejor = s;
+			mejor_sol = t.Solucion();
+		} else{
+			vector<pair<int, int> > puntos = t.Puntos();
+			int n = puntos.size();
 
-	for(int i = 0; i < n; i++){
-		if(t.EstaVivo(i)){
-			if(unico_vivo){
-				Tablero sucesor(t);
-				vector<int> derrotados;
-				derrotados.push_back(i);
-				sucesor.Matar(derrotados);
-				sucesores.push_back(sucesor);
-				break;
-			}else{
-				double x_1 = puntos[i].first;
-				double y_1 = puntos[i].second;
-				vector<double> pendientes(n, 0);
-				for(int j = 0; j < n; j++) {
-					double pendiente = 0;
-					if(j != i && t.EstaVivo(j)){
-						double x_2 = puntos[j].first;
-						double y_2 = puntos[j].second;				
-						if(x_2 != x_1) pendiente = (y_2-y_1) / (x_2-x_1); //guarda con esto, hay que hacer algo despues
-						pendientes[j] = pendiente;
-					}
-				}
-
-				for(int j = 0; j < n; j++){
-					if(j != i && t.EstaVivo(j)){
-						Tablero sucesor(t);
+			for(int i=0; i<n; i++){
+				if(t.EstaVivo(i)){
+					if(t.Vivos() == 1){
 						vector<int> derrotados;
 						derrotados.push_back(i);
-						derrotados.push_back(j);
-						for(int k = 0; k < n; k++){
-							if(k != i && k != j && t.EstaVivo(k) && pendientes[k] == pendientes[j]){
-								if(mismo_cuadrante(puntos[i], puntos[j], puntos[k])) derrotados.push_back(k);
+						t.Matar(derrotados);
+						bt(t, s+1);
+						break;
+					}
+					for(int j=0; j<n; j++){
+						if(j != i && t.EstaVivo(j)){
+							Tablero sucesor(t);
+							vector<int> derrotados;
+							derrotados.push_back(i);
+							derrotados.push_back(j);
+							double x_i = puntos[i].first;
+							double y_i = puntos[i].second;
+							double x_j = puntos[j].first;
+							double y_j = puntos[j].second;
+							for(int k = 0; k < n; k++){
+								if(k != i && k != j && t.EstaVivo(k)){
+									double x_k = puntos[k].first;
+									double y_k = puntos[k].second;
+									double cociente_x = (x_k - x_i) / (x_j - x_i); 
+									double cociente_y = (y_k - y_i) / (y_j - y_i); 
+									if(cociente_x == cociente_y && mismo_cuadrante(puntos[i], puntos[j], puntos[k])) derrotados.push_back(k);
+								}
 							}
+							sucesor.Matar(derrotados);
+							bt(sucesor, s+1);
 						}
-						sucesor.Matar(derrotados);
-						sucesores.push_back(sucesor);
 					}
 				}
 			}
-	    }
-    }
-
-    return sucesores;
-}
-
-void bt(Tablero t, int k) {
-	if(k < mejor) { //El subarbol es aceptable
-		if(t.Solucionado()){
-			mejor = k;
-			mejor_sol = t.Solucion();
-		} else{
-			vector<Tablero> sucesores = encontrar_sucesores(t);
-			for(int i = 0; i < sucesores.size(); i++) bt(sucesores[i], k+1);
 		}
 	}
 }
