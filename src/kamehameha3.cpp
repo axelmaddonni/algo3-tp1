@@ -86,26 +86,25 @@ vector<vector<int> > solve(vector<pair<int, int> > puntos) {
 }
 
 int main() {
-    int n;
-    cin >> n;
+  int n;
+  cin >> n;
+  vector<pair<int, int> > puntos;
 
-    vector<pair<int, int> > puntos;
-
-    for (int i = 0; i < n; i++) {
-        int x, y;
-        cin >> x >> y;
-        puntos.push_back(make_pair(x, y));
+  for (int i = 0; i < n; i++) {
+    int x, y;
+    cin >> x >> y;
+    puntos.push_back(make_pair(x, y));
+  }
+  vector<vector<int> > solucion = solve(puntos);
+  cout << solucion.size() << endl;
+  for (unsigned int i = 0; i < solucion.size(); i++) {
+    const vector<int>& iesimo_kamehameha = solucion[i];
+    cout << iesimo_kamehameha.size() << " ";
+    for (unsigned int j = 0; j < iesimo_kamehameha.size(); j++) {
+      cout << iesimo_kamehameha[j] + 1 << " ";
     }
-    vector<vector<int> > solucion = solve(puntos);
-    cout << solucion.size() << endl;
-    for (unsigned int i = 0; i < solucion.size(); i++) {
-        const vector<int>& iesimo_kamehameha = solucion[i];
-        cout << iesimo_kamehameha.size() << " ";
-        for (unsigned int j = 0; j < iesimo_kamehameha.size(); j++) {
-            cout << iesimo_kamehameha[j] + 1 << " ";
-        }
-        cout << endl;
-    }
+    cout << endl;
+  }
 
-    return 0;
+  return 0;
 }
