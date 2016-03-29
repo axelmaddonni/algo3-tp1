@@ -36,7 +36,8 @@ bool Tablero::EstaVivo(int androide){
 
 void Tablero::Matar(vector<int> androides){
 	solucion.push_back(androides);
-	for (auto i = 0; i < androides.size(); i++) vivos[androides[i]] = false;
+	for (unsigned int i = 0; i < androides.size(); i++)
+    vivos[androides[i]] = false;
 	cant_vivos -= androides.size();
 }
 
@@ -50,7 +51,8 @@ vector<vector<int> > Tablero::Solucion(){
 
 bool Tablero::Solucionado(){
 	unsigned int total = 0;
-	for(int i=0; i < solucion.size(); i++) total += solucion[i].size();
+	for(unsigned int i = 0; i < solucion.size(); i++)
+    total += solucion[i].size();
 	return total == puntos->size();
 }
 

@@ -98,10 +98,10 @@ int main() {
     }
     vector<vector<int> > solucion = solve(puntos);
     cout << solucion.size() << endl;
-    for (int i = 0; i < solucion.size(); i++) {
+    for (unsigned int i = 0; i < solucion.size(); i++) {
         const vector<int>& iesimo_kamehameha = solucion[i];
         cout << iesimo_kamehameha.size() << " ";
-        for (int j = 0; j < iesimo_kamehameha.size(); j++) {
+        for (unsigned int j = 0; j < iesimo_kamehameha.size(); j++) {
             cout << iesimo_kamehameha[j] + 1 << " ";
         }
         cout << endl;

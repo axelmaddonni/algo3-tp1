@@ -3,13 +3,13 @@ CFLAGS = -O2 -Wall --std=c++11
 TESTS = 100
 
 
-problema1:
+problema1: kaioken1.cpp
 	$(CC) $(CFLAGS) kaioken1.cpp -o problema1
 
-problema2:
+problema2: genkidama2.cpp
 	$(CC) $(CFLAGS) genkidama2.cpp -o problema2
 
-problema3:
+problema3: kamehameha3.cpp Tablero.h
 	$(CC) $(CFLAGS) kamehameha3.cpp -o problema3
 
 test1: problema1

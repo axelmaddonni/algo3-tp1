@@ -36,7 +36,7 @@ int main() {
   }
   std::vector<int> es = solve(puntos, t);
   std::cout << es.size() << std::endl;
-  for (int i = 0; i < es.size(); i++) {
+  for (unsigned int i = 0; i < es.size(); i++) {
     if (i != es.size()-1) {
       std::cout << es[i] << " ";
     }
