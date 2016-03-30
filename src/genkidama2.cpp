@@ -1,6 +1,8 @@
 #include <iostream>
 #include <utility>
 #include <vector>
+#include <ctime>
+#include <chrono>
 
 std::vector<int> solve(std::vector<std::pair<int, int>> puntos, int t) {
   int n = puntos.size();
@@ -34,11 +36,22 @@ int main() {
     std::cin >> x >> y;
     puntos.push_back(std::make_pair(x, y));
   }
-  std::vector<int> es = solve(puntos, t);
+
+  std::chrono::time_point<std::chrono::system_clock> start, end;
+  start = std::chrono::system_clock::now();
+  std::vector<int> es = solve(puntos, t); // Resolvemos el problema.
+  end = std::chrono::system_clock::now();
+
   std::cout << es.size() << std::endl;
   for (unsigned int i = 0; i < es.size(); i++) {
     std::cout << es[i] << " ";
   }
   std::cout << std::endl;
+
+  std::chrono::duration<double> segundos = end - start;
+  #ifdef TOMAR_TIEMPO
+  std::cerr << segundos.count();
+  #endif
+
   return 0;
 }

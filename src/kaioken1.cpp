@@ -1,6 +1,8 @@
 #include <iostream> 
 #include <math.h> 
 #include <vector> 
+#include <ctime>
+#include <chrono>
 #include <stdlib.h> 
 
 using namespace std;
@@ -69,7 +71,16 @@ int main() {
   int k;
   std::cin >> k;
 
-  kaioken (k);
+
+  std::chrono::time_point<std::chrono::system_clock> start, end;
+  start = std::chrono::system_clock::now();
+  kaioken(k); // Resolvemos el problema.
+  end = std::chrono::system_clock::now();
+
+  std::chrono::duration<double> segundos = end - start;
+  #ifdef TOMAR_TIEMPO
+  std::cerr << segundos.count();
+  #endif
 
   return 0;
 }
