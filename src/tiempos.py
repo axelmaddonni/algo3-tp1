@@ -56,7 +56,7 @@ def correr_programa(binario):
                          shell = True,
                          stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     out, err = p.communicate()
-    return 1000 * float(err)
+    return 1000000 * float(err)
 
 def mean(xs):
     if len(xs) == 0:
@@ -73,17 +73,20 @@ def median(xs):
 
 binarios = ["", "./problema1", "./problema2", "./problema3"]
 
+def tiempo_normalizado(problema, tiempo, n):
+    if problema == 1:
+        return tiempo / (n * math.log(n))
+    elif problema == 2:
+        return tiempo / n
+    elif problema == 3:
+        return tiempo / n**(n+2)
+
 def encontrar_k(problema, puntos):
     ks = []
-    puntos = puntos[1:]
+    puntos = puntos[3:]
 
     for n, tiempo in puntos:
-        if problema == 1:
-            ks.append(tiempo / (n * math.log(n)))
-        elif problema == 2:
-            ks.append(tiempo / n)
-        elif problema == 3:
-            ks.append(tiempo / n**(n+2))
+        ks.append(tiempo_normalizado(problema, tiempo, n))
     return mean(ks)
 
 
@@ -92,19 +95,22 @@ def main():
     posiciones = []
     for tamanio_muestra in range(0, ultimo, granularidad):
         if tamanio_muestra == 0: tamanio_muestra = 1
+        print tamanio_muestra
         posiciones.append(float(tamanio_muestra))
         tiempos = []
         for seed in range(cantidad_muestras):
+            mediciones = 10
+            mediciones_vector = []
             random.seed(seed)
             if problema == 1:
                 generar1(tamanio_muestra)
-                tiempos.append(correr_programa(binarios[problema]))
             elif problema == 2:
                 generar2(tamanio_muestra)
-                tiempos.append(correr_programa(binarios[problema]))
             elif problema == 3:
                 generar3(tamanio_muestra)
-                tiempos.append(correr_programa(binarios[problema]))
+            for medicion in range(mediciones):
+                mediciones_vector.append(correr_programa(binarios[problema]))
+            tiempos.append(min(mediciones_vector))
         datos.append(tiempos)
     plt.figure()
     puntos = zip(map(float, posiciones), map(median, datos))
@@ -118,13 +124,29 @@ def main():
         fit = map(lambda n: k * n**(n+2), posiciones)
     print [x[1] for x in puntos]
     print fit
-    plt.plot(posiciones, fit)
-    plt.boxplot(datos, positions=posiciones, widths=granularidad/2.0,
-                showfliers=False)
-    plt.show()
+    posiciones_ints = map(int, posiciones)
+    plt.plot(posiciones_ints, map(median, datos),
+            label="Nuestro algoritmo")
+    plt.plot(posiciones_ints, map(lambda x: 1.1 * x, fit),
+            label="{0:.2f}".format(k * 1.1)+" n log n", linestyle='--')
+    plt.plot(posiciones_ints, map(lambda x: 0.9 * x, fit),
+            label="{0:.2f}".format(k * 0.9)+" n log n", linestyle='--')
+    #plt.boxplot(datos, positions=posiciones_ints, widths=granularidad/2.0,
+    #            showfliers=False)
+    plt.legend(loc=2)
+    plt.xlabel("Tamano de la entrada")
+    plt.ylabel("Tiempo (us)")
+    """
+    plt.plot(posiciones_ints, map(lambda (x, n) : 0 if n*math.log(n) < 0.1 else x / (n * math.log(n)), zip(map(median, datos), posiciones)))
+    for i in range(20):
+        if 2**i > ultimo:
+            break
+        plt.axvline(2**i, color="black", linestyle='--')
 
+    plt.xlabel("Tamano de la entrada")
+    plt.ylabel("Tiempo (us) / nlogn")
+    """
+    plt.savefig("foo.pdf")
 
 main()
 os.remove(archivo)
-
-
