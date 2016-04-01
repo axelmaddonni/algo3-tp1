@@ -8,7 +8,7 @@
 using namespace std;
 
 void generarpeleas(int n, int pactual, int inicio,
-                   vector<vector<int>> &matrizpeleas, int cpeleas){
+                   vector<vector<int>> &matrizpeleas){
   if (n == 1) {
     matrizpeleas[pactual][inicio] = 1;
   } else if (n == 2) {
@@ -22,12 +22,8 @@ void generarpeleas(int n, int pactual, int inicio,
         matrizpeleas[pactual][inicio + j] = 2;
       }
     }
-    if (pactual != cpeleas - 1) {
-      generarpeleas(n/2, pactual+1, inicio,
-                    matrizpeleas, cpeleas);
-      generarpeleas(n/2 + ((n%2 == 1) ? 1 : 0), pactual+1, n/2 + inicio,
-                    matrizpeleas, cpeleas);
-    }
+    generarpeleas(n / 2, pactual+1, inicio, matrizpeleas);
+    generarpeleas((n + 1) / 2, pactual+1, n/2 + inicio, matrizpeleas);
   }
 }
 
@@ -50,10 +46,8 @@ void kaioken (int n){
       }
     }
 
-    generarpeleas(n/2, pactual+1, 0,
-                  matrizpeleas, cpeleas);
-    generarpeleas(n/2 + ((n%2 == 1) ? 1 : 0), pactual+1, n/2,
-                  matrizpeleas, cpeleas);
+    generarpeleas(n / 2, pactual+1, 0, matrizpeleas);
+    generarpeleas((n + 1) / 2, pactual+1, n/2, matrizpeleas);
 
     // Imprimo la matriz
     for (int i = 0; i < cpeleas; i++) {

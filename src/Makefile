@@ -2,7 +2,7 @@ CC = g++
 CFLAGS = -O2 -Wall --std=c++11
 PYTHON = python2
 TESTS_CORRECTITUD = 100
-MUESTRAS = 10
+MUESTRAS = 30
 
 
 problema1: kaioken1.cpp
@@ -31,7 +31,7 @@ tiempos1: problema1 tiempos.py
 
 tiempos2: CFLAGS += -DTOMAR_TIEMPO
 tiempos2: problema2 tiempos.py
-	$(PYTHON) tiempos.py 2 200 10000 $(MUESTRAS)
+	$(PYTHON) tiempos.py 2 400 5000 $(MUESTRAS)
 
 tiempos3: CFLAGS += -DTOMAR_TIEMPO
 tiempos3: problema3 tiempos.py
