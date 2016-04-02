@@ -8,6 +8,8 @@
 
 int mejor;
 vector<vector<int>> mejor_sol;
+std::vector<pair<int, int>> puntos;
+int n = puntos.size();
 
 bool mismo_cuadrante(pair<int, int> pi, pair<int, int> pj, pair<int, int> pk) {
   int x_i = pi.first;
@@ -25,56 +27,52 @@ bool mismo_cuadrante(pair<int, int> pi, pair<int, int> pj, pair<int, int> pk) {
   return false;
 }
 
-void bt(Tablero t, int s) {
-  if(s < mejor) {  // El subarbol es aceptable
-    if(t.Solucionado()) {
-      mejor = s;
-      mejor_sol = t.Solucion();
-    } else {
-      std::vector<pair<int, int>> puntos = *(t.Puntos());
-      int n = puntos.size();
-
-      for (int i = 0; i < n; i++) {
-        if (t.EstaVivo(i)) {
-          if (t.Vivos() == 1) {
-            vector<int> derrotados;
+void backtracking(Tablero t, int s) {
+  if(s >= mejor) return;  // El subarbol no es aceptable
+  if(t.Solucionado()) {
+    mejor = s;
+    mejor_sol = t.Solucion();
+  } else {
+    for (int i = 0; i < n; i++) {
+      if (t.EstaVivo(i)) {
+        if (t.Vivos() == 1) {
+          vector<int> derrotados;
+          derrotados.push_back(i);
+          t.Matar(derrotados);
+          backtracking(t, s+1);
+          break;
+        }
+        for (int j = 0; j < n; j++) {
+          if(j != i && t.EstaVivo(j)){
+            Tablero sucesor(t);
+            std::vector<int> derrotados;
             derrotados.push_back(i);
-            t.Matar(derrotados);
-            bt(t, s+1);
-            break;
-          }
-          for (int j = 0; j < n; j++) {
-            if(j != i && t.EstaVivo(j)){
-              Tablero sucesor(t);
-              std::vector<int> derrotados;
-              derrotados.push_back(i);
-              derrotados.push_back(j);
-              double x_i = puntos[i].first;
-              double y_i = puntos[i].second;
-              double x_j = puntos[j].first;
-              double y_j = puntos[j].second;
-              for (int k = 0; k < n; k++) {
-                if(k != i && k != j && t.EstaVivo(k)) {
-                  double x_k = puntos[k].first;
-                  double y_k = puntos[k].second;
-                  if (x_i != x_j && y_i != y_j) {
-                    double cociente_x = (x_k - x_i) / (x_j - x_i); 
-                    double cociente_y = (y_k - y_i) / (y_j - y_i); 
-                    if (cociente_x == cociente_y &&
-                        mismo_cuadrante(puntos[i], puntos[j], puntos[k]))
-                      derrotados.push_back(k);
-                  } else {
-                    bool al_vertical = (x_k == x_i && x_k == x_j);
-                    bool al_horizontal = (y_k == y_i && y_k == y_j);
-                    if ((al_vertical || al_horizontal) &&
-                        mismo_cuadrante(puntos[i], puntos[j], puntos[k]))
-                      derrotados.push_back(k);
-                  }
+            derrotados.push_back(j);
+            double x_i = puntos[i].first;
+            double y_i = puntos[i].second;
+            double x_j = puntos[j].first;
+            double y_j = puntos[j].second;
+            for (int k = 0; k < n; k++) {
+              if(k != i && k != j && t.EstaVivo(k)) {
+                double x_k = puntos[k].first;
+                double y_k = puntos[k].second;
+                if (x_i != x_j && y_i != y_j) {
+                  double cociente_x = (x_k - x_i) / (x_j - x_i); 
+                  double cociente_y = (y_k - y_i) / (y_j - y_i); 
+                  if (cociente_x == cociente_y &&
+                      mismo_cuadrante(puntos[i], puntos[j], puntos[k]))
+                    derrotados.push_back(k);
+                } else {
+                  bool al_vertical = (x_k == x_i && x_k == x_j);
+                  bool al_horizontal = (y_k == y_i && y_k == y_j);
+                  if ((al_vertical || al_horizontal) &&
+                      mismo_cuadrante(puntos[i], puntos[j], puntos[k]))
+                    derrotados.push_back(k);
                 }
               }
-              sucesor.Matar(derrotados);
-              bt(sucesor, s+1);
             }
+            sucesor.Matar(derrotados);
+            backtracking(sucesor, s+1);
           }
         }
       }
@@ -82,28 +80,28 @@ void bt(Tablero t, int s) {
   }
 }
 
-vector<vector<int> > solve(vector<pair<int, int> > puntos) {
-  Tablero inicial(&puntos);
+vector<vector<int> > solve(vector<pair<int, int> > ptos) {
+  puntos = ptos;
+  Tablero inicial(n);
   mejor = puntos.size();
-  bt(inicial, 0);
+  backtracking(inicial, 0);
 
   return mejor_sol;
 }
 
 int main() {
-  int n;
   std::cin >> n;
-  std::vector<pair<int, int>> puntos;
+  std::vector<pair<int, int>> ptos;
 
   for (int i = 0; i < n; i++) {
     int x, y;
     std::cin >> x >> y;
-    puntos.push_back(make_pair(x, y));
+    ptos.push_back(make_pair(x, y));
   }
   std::chrono::time_point<std::chrono::system_clock> start, end;
   start = std::chrono::system_clock::now();
   // Resolvemos el problema.
-  std::vector<std::vector<int>> solucion = solve(puntos); 
+  std::vector<std::vector<int>> solucion = solve(ptos); 
   end = std::chrono::system_clock::now();
 
   std::cout << solucion.size() << endl;
