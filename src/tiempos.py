@@ -119,7 +119,7 @@ def main():
         posiciones.append(float(tamanio_muestra))
         tiempos = []
         for seed in range(cantidad_muestras):
-            mediciones = 2
+            mediciones = 10
             mediciones_vector = []
             random.seed(seed)
             if problema == 1:
@@ -148,12 +148,12 @@ def main():
     print fit
 
     posiciones_ints = map(int, posiciones)
-    plt.plot(posiciones_ints, map(lambda (n, tiempo): tiempo / (n*n*n),
+    plt.plot(posiciones_ints, map(lambda (n, tiempo): tiempo,
         zip(posiciones_ints, map(median, datos))), label="Algoritmo con poda")
     plt.legend(loc=2)
     plt.xlabel("Tamano de la entrada")
-    plt.ylabel("Tiempo (us) / n^3")
-    plt.ylim([0, 0.1])
+    plt.ylabel("Tiempo (us)")
+    #plt.ylim([0, 0.1])
     """
     posiciones_ints = map(int, posiciones)
     plt.plot(posiciones_ints, map(median, datos),
@@ -168,7 +168,8 @@ def main():
     plt.xlabel("Tamano de la entrada")
     plt.ylabel("Tiempo (us)")
     """
-    plt.savefig("foo.pdf")
+    #plt.savefig("foo.pdf")
+    plt.show()
 
 
 main()

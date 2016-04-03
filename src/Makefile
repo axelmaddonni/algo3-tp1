@@ -33,7 +33,7 @@ tiempos2: problema2 tiempos.py
 
 tiempos3: CFLAGS += -DTOMAR_TIEMPO
 tiempos3: problema3 tiempos.py
-	$(PYTHON) tiempos.py 3 1 10 10
+	$(PYTHON) tiempos.py 3 1 300 1
 
 
 clean:
