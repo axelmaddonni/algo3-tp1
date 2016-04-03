@@ -40,16 +40,36 @@ def generar2(tamanio_muestra):
         f.write(str(x) + " " + str(y) + "\n")
 
 
-def generar3(tamanio_muestra):
+def generar3promedio(tamanio_muestra):
     f = open(archivo, "w")
     n = tamanio_muestra
     MAXIMO_T = n
     MAXIMA_COORD = 2 * n
     f.write(str(n) + "\n")
-    xs = random.sample(range(MAXIMA_COORD), n)
-    ys = random.sample(range(MAXIMA_COORD), n)
-    for x, y in zip(xs, ys):
+    puntos = []
+    for _ in range(n):
+        punto = (random.randint(1, MAXIMA_COORD), random.randint(1, MAXIMA_COORD))
+        if punto not in puntos:
+            puntos.append(punto)
+    for x, y in puntos:
         f.write(str(x) + " " + str(y) + "\n")
+
+def generar3mejor(tamanio_muestra):
+    f = open(archivo, "w")
+    n = tamanio_muestra
+    f.write(str(n) + "\n")
+    for i in range(n):
+        f.write(str(i+1) + " " + str(i+1) + "\n")
+
+def generar3peor(tamanio_muestra):
+    f = open(archivo, "w")
+    n = tamanio_muestra
+    f.write(str(n) + "\n")
+    for i in range(n):
+        angle = 2 * math.pi * random.random()
+        x = (float(n) / 2) *  math.cos(angle) + n
+        y = (float(n) / 2) *  math.sin(angle) + n
+        f.write(str(int(x)) + " " + str(int(y)) + "\n")
 
 def correr_programa(binario):
     p = subprocess.Popen("cat " + archivo + " | " + binario,
@@ -83,7 +103,7 @@ def tiempo_normalizado(problema, tiempo, n):
 
 def encontrar_k(problema, puntos):
     ks = []
-    puntos = puntos[3:]
+    puntos = puntos[1:-6]
 
     for n, tiempo in puntos:
         ks.append(tiempo_normalizado(problema, tiempo, n))
@@ -99,7 +119,7 @@ def main():
         posiciones.append(float(tamanio_muestra))
         tiempos = []
         for seed in range(cantidad_muestras):
-            mediciones = 10
+            mediciones = 2
             mediciones_vector = []
             random.seed(seed)
             if problema == 1:
@@ -107,23 +127,34 @@ def main():
             elif problema == 2:
                 generar2(tamanio_muestra)
             elif problema == 3:
-                generar3(tamanio_muestra)
+                generar3mejor(tamanio_muestra)
             for medicion in range(mediciones):
                 mediciones_vector.append(correr_programa(binarios[problema]))
             tiempos.append(min(mediciones_vector))
         datos.append(tiempos)
     plt.figure()
     puntos = zip(map(float, posiciones), map(median, datos))
-    k = encontrar_k(problema, puntos)
+    #k = encontrar_k(problema, puntos)
+    k = 0.05
     fit = []
     if problema == 1:
         fit = map(lambda n: k * n * math.log(n), posiciones)
     elif problema == 2:
         fit = map(lambda n: k * n, posiciones)
     elif problema == 3:
-        fit = map(lambda n: k * n**(n+2), posiciones)
+        #fit = map(lambda n: k * n**(n+2), posiciones
+        fit = map(lambda n: k * n * n * n, posiciones)
     print [x[1] for x in puntos]
     print fit
+
+    posiciones_ints = map(int, posiciones)
+    plt.plot(posiciones_ints, map(lambda (n, tiempo): tiempo / (n*n*n),
+        zip(posiciones_ints, map(median, datos))), label="Algoritmo con poda")
+    plt.legend(loc=2)
+    plt.xlabel("Tamano de la entrada")
+    plt.ylabel("Tiempo (us) / n^3")
+    plt.ylim([0, 0.1])
+    """
     posiciones_ints = map(int, posiciones)
     plt.plot(posiciones_ints, map(median, datos),
             label="Nuestro algoritmo")
@@ -137,16 +168,8 @@ def main():
     plt.xlabel("Tamano de la entrada")
     plt.ylabel("Tiempo (us)")
     """
-    plt.plot(posiciones_ints, map(lambda (x, n) : 0 if n*math.log(n) < 0.1 else x / (n * math.log(n)), zip(map(median, datos), posiciones)))
-    for i in range(20):
-        if 2**i > ultimo:
-            break
-        plt.axvline(2**i, color="black", linestyle='--')
-
-    plt.xlabel("Tamano de la entrada")
-    plt.ylabel("Tiempo (us) / nlogn")
-    """
     plt.savefig("foo.pdf")
+
 
 main()
 os.remove(archivo)
