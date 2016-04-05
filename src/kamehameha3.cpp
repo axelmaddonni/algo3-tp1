@@ -73,6 +73,7 @@ void backtracking(Tablero t, int s) {
             }
             sucesor.Matar(derrotados);
             backtracking(sucesor, s+1);
+            if (mejor == s+1) return;
           }
         }
       }
