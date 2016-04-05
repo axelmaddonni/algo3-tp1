@@ -114,12 +114,7 @@ La idea de \texttt{backtracking} es preservar esta garantía de correctitud pero
 
 \subsection{Performance del algoritmo}
 
-\begin{figure}[H]
- \centering
-	\includegraphics[width=0.8\textwidth]{img/tiempos/kamehameha2.pdf}
-	\caption{\footnotesize Tiempo que toma el algoritmo en $\mu$s para una entrada de tamaño $n$.}
-	\label{fig:kamehameha-tiempos2}
-\end{figure}
+Como vimos anteriormente, el algoritmo tiene una complejidad de $O(n^{n+2})$. Sin embargo, esta cota no era ajustada. Veamos si esto se refleja en la realidad. El primer caso que analizaremos es el peor caso, es decir, aquel en el que siempre se necesitan $\frac{n}{2}$ rectas, el máximo posible.
 
 \begin{figure}[H]
  \centering
@@ -127,6 +122,23 @@ La idea de \texttt{backtracking} es preservar esta garantía de correctitud pero
 	\caption{\footnotesize Tiempo que toma el algoritmo en $\mu$s para una entrada de tamaño $n$.}
 	\label{fig:kamehameha-tiempos1}
 \end{figure}
+
+Como puede verse, el tiempo requerido por el algoritmo crece muy aceleradamente, razón por la cual debimos analizarlo hasta $n = 12$, para el cual cada corrida tardaba alrededor de 15 minutos (Nótese que si $n = 12$, entonces $n^{n+2} \equiv 10^15$).
+
+Como este es el peor caso, la poda no contribuye en nada, dado que hay que recorrer cada posibilidad de entre todas las combinaciones. Esto se refleja claramente en el gráfico.
+
+Analicemos ahora el caso promedio.
+
+\begin{figure}[H]
+ \centering
+	\includegraphics[width=0.8\textwidth]{img/tiempos/kamehameha2.pdf}
+	\caption{\footnotesize Tiempo que toma el algoritmo en $\mu$s para una entrada de tamaño $n$.}
+	\label{fig:kamehameha-tiempos2}
+\end{figure}
+
+Como puede verse en la figura \ref{fig:kamehameha-tiempos2}, el caso promedio es muy similar al peor caso. Esto se debe, a que lo mas probable es que se necesiten $\frac{n}{2}$ rectas para cubrir a todos los puntos. Esto se prueba en el ap\'endice.
+
+Por último, analicemos el mejor caso. El mejor caso es, obviamente, en el que se necesita una sola recta para cubrir a todos los puntos, y esta recta se encuentra en el primer intento. Como vimos antes, en este caso la complejidad del algoritmo es de $O(n)$. Veamos si esto se confirma experimentalmente.
 
 \begin{figure}[H]
  \centering
@@ -142,5 +154,17 @@ La idea de \texttt{backtracking} es preservar esta garantía de correctitud pero
 	\label{fig:kamehameha-tiempos4}
 \end{figure}
 
+Efectivamente, se ve que la complejidad del algoritmo es de $O(n)$. La disminución del tiempo de ejecución alrededor de $n = 8200$ no pudo ser explicada por nosotros. Dado que 8192 es una potencia de 2, podemos inferir que tiene que ver con un tema de \emph{cache} al almacenar los datos en memoria.
 
+\subsubsection{M\'etodo de experimentación}
 
+Para el peor caso, para asegurarnos que siempre se requirieran exactamente $\frac{n}{2}$ rectas para cubrir todos los puntos. Para esto lo que hicimos fue tomar $n$ puntos sobre una circunferencia (específicamente, sobre la circunferencia de radio $\frac{n}{2}$ con centro en el $(n,n)$). Nótese que (por la definición de circunferencia) no hay 3 puntos en la misma recta, por lo tanto necesitaremos $\frac{n}{2}$ rectas para cubrir todos los puntos.
+
+El caso promedio se genera de manera similar al problema anterior. Para cada $n$, elegimos $n$ puntos al azar de la grilla $\{1,..., n^2\} \times \{1, ... , n^2\}$.
+
+Estos puntos eran elegidos al azar usando el mismo \emph{seed} cada vez (para la instancia 1 usabamos 1 como seed, para la instancia 2, usabamos 2, etc.), de tal manera que los experimentos fueran reproducibles de una manera válida.
+La cantidad de instancias que creamos para cada $n$ fue 40.
+Cada instancia fue ejecutada 20 veces, y el resultado final era el mínimo de todas las corridas.
+Luego, tomabamos la mediana de todas las instancias. Es decir, el restultado final es la mediana de los mínimos.
+
+Finalmente, para el mejor caso, el caso de tamaño $n$ estará formado por los puntos $\{(1,1), (2,2), \cdots, (n, n)\}$, en ese orden, de tal manera que el backtracking tome a los puntos $(1,1)$ y $(2,2)$ en su primer intento, y ese intento sea el exitoso.
