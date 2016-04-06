@@ -1,6 +1,10 @@
 \subsection{Explicación formal del problema}
 \label{subsec:problema3}
-Sea el conjunto de puntos del primer cuadrante $C = \{(x_1, y_1), \hdots, (x_n, y_n)\}$. Se desea hallar alguna partición, $P$, del mismo que tenga cardinalidad mínima y cumpla la siguiente condición: $(\forall X \in P) (\exists r$ : semirrecta$) (\forall punto \in X)$ $punto \in r$. Esto es, que cada conjunto de la partición solo puede tener puntos que pertenecen a una misma semirrecta (sea cual sea esta). 
+Sea el conjunto de puntos del primer cuadrante $C = \{(x_1, y_1), \hdots, (x_n, y_n)\}$. Se desea hallar alguna partición, $P$, del mismo que cumpla las siguientes dos propiedades:
+\begin{enumerate}
+  \item $P$ tiene cardinalidad mínima;
+  \item $(\forall X \in P) (\exists r$ : semirrecta$) (\forall punto \in X)$ $punto \in r$. Esto es, que cada conjunto de la partición solo puede tener puntos que pertenecen a una misma semirrecta (sea cual sea esta). 
+\end{enumerate}
 Notar que la segunda condición no restringe la posibilidad de que $r$ atraviese puntos de otro conjunto de la partición. 
 %También ver que por la primer condición (cardinalidad mínima), si $r'$ es la semirrecta correspondiente a $X'$, no puede ocurrir que $r' \subset r$ pues en tal caso considero la partición $P'$, igual a $P$ salvo porque tengo $X'' = X \cup X'$ (que cumple la segunda condición dado que $r$ verifica bien) en lugar de $X$ y $X'$, y por tanto tiene cardinalidad estrictamente menor que $P$, lo que conduce a un absurdo. 
 
@@ -50,18 +54,26 @@ Por lo dicho en el párrafo anterior, se puede establecer una cota superior al c
 \end{figure}
 
 \subsection{Explicación de la solución}
-En esta sección daremos una breve explicación de porque el método de \texttt{backtracking} resulta correcto para resolver el problema presentado,  luego contaremos las podas y estrategias utilizadas, y finalmente presentaremos una explicación de las partes fundamentales de la implementación. 
+En esta sección daremos una explicación de por que el método de \texttt{backtracking} resulta correcto para resolver el problema presentado,  luego contaremos las podas y estrategias utilizadas, y finalmente presentaremos una explicación de las partes fundamentales de la implementación. 
+
+En lo que sigue utilizaremos la siguiente terminología:
+\begin{itemize}
+  \item Solución: Es una partición $P$ de $C$ que satisface ambas condiciones del enunciado.
+  \item Candidato a solución: Son las particiones de $C$ que satisfacen la segunda propiedad, aunque no necesariamente son de cardinal mínimo.
+  \item Candidato a solución parcial: Es algún subconjunto de algún ``candidato a solución''. Es decir, es un conjunto de subconjuntos de $C$ tal que estos son disjuntos dos a dos, pero donde la unión de los mismos no es $C$.
+  \item Sucesor: Dado un ``candidato a solución parcial'', $X$, un sucesor del mismo es otro conjunto, $X'$, tal que $X'$ es o bien ``candidato a solución'', o bien ``candidato a solución parcial'', que cumple $X \subset X'$ (notar que la inclusión debe ser estricta).
+\end{itemize}
 
 \subsubsection{Árbol de posibilidades}
-Los algoritmos de \texttt{backtracking} son un refinamiento de los algoritmos de fuerza bruta por lo que pensemos primero la solución usando este método. Este último tipo de algoritmos consisten en enumerar todos los posibles candidatos a solución del problema y ver si satisfacen las condiciones pedidas o no. En nuestro caso particular, todas los posibles candidatos van a ser las particiones que cumplan la segunda condición del enunciado, y de estas nos quedamos con alguna que tenga cardinal mínimo. 
+Los algoritmos de \textit{backtracking} son un refinamiento de los algoritmos de fuerza bruta por lo que pensemos primero la solución usando este método. Este último tipo de algoritmos consisten en enumerar todos los posibles candidatos a solución del problema y ver si satisfacen las condiciones pedidas o no. En nuestro caso particular, deberemos ver cuáles tienen cardinalidad mínima.
 
-El proceso de construir las particiones se puede pensar como un árbol en el que en cada nivel se agrega un nuevo conjunto de los posibles a la partición que estoy armando. Así, en el nivel 0 (la raíz) tengo un conjunto vacío. En el nivel 1 tengo todos los subconjuntos de $C$ que verifican que existe alguna semirrecta que los une. Al escoger alguno de estos conjuntos lo agregamos en la potencial partición. Debido a esto, en el nivel 2 tenemos un subconjunto de las posibilidades del nivel 1 estrictamente más pequeño pues debemos eliminar todas aquellas opciones que involucraban alguno de los puntos presentes en el conjunto previamente agregado (los conjuntos de la partición deben ser disjuntos). Se repite un procedimiento análogo hasta completar la partición, momento en el que estaremos parados en una hoja del árbol. 
+El proceso de construir las particiones se puede pensar como un árbol en el que en cada nivel se agrega un nuevo conjunto de los posibles a la partición que estoy armando. Así, en el nivel 0 (la raíz) tengo un conjunto vacío. En el nivel 1 tengo todos los subconjuntos de $C$ que verifican que existe alguna semirrecta que los une. Al escoger alguno de estos conjuntos lo agregamos en el candidato a solución parcial (o sea, obtenemos un sucesor del candidato a solución parcial inicial). Debido a esto, en el nivel 2 tenemos un subconjunto de las posibilidades del nivel 1 estrictamente más pequeño pues debemos eliminar todas aquellas opciones que involucraban alguno de los puntos presentes en el conjunto previamente agregado (los conjuntos de la partición deben ser disjuntos). Se repite un procedimiento análogo hasta completar el candidato a solución, momento en el que estaremos parados en una hoja del árbol. 
 
 Haciendo DFS (Depth-first search) recorremos todo el árbol de posibilidades, de forma que finalmente encontramos todas las particiones que cumplen la condición dos. Finalmente nos quedamos con alguna de cardinal mínimo (si hubiera más de una).
 
 La correctitud de tal algoritmo es clara pues encuentra todo el universo de posibles soluciones, por lo que si efectivamente existe alguna eventualmente la obtiene. En particular, para todo conjunto finito es posible establecer particiones, así que siempre hay solución. 
 
-La idea de \texttt{backtracking} es preservar esta garantía de correctitud pero agilizando la búsqueda mediante la utilización de podas en el árbol de posibilidades. Dicho de otra forma, un algoritmo de este tipo descarta \texttt{candidatos a soluciones parciales} que a partir de algún criterio podemos predecir que no nos van a conducir a la solución. En nuestro problema, un candidato a solución parcial es una partición en construcción. En la siguiente sección mostramos con que criterios los descartamos.
+La idea de \textit{backtracking} es preservar esta garantía de correctitud pero agilizando la búsqueda mediante la utilización de podas en el árbol de posibilidades. Dicho de otra forma, un algoritmo de este tipo descarta candidatos a soluciones parciales que a partir de algún criterio podemos predecir que no nos van a conducir a la solución. 
 
 \subsubsection{Podas realizadas}
 Una estrategia básica, basada en lo observado en la sección \ref{subsec:problema3}, es no considerar agregar conjuntos que tienen un solo elemento, salvo potencialmente en el último paso. Además, planteamos dos podas:
@@ -71,24 +83,26 @@ Una estrategia básica, basada en lo observado en la sección \ref{subsec:proble
   \item Si actualmente estamos parados en un nodo de nivel $s$, y nos movemos a un sucesor en el nivel $s+1$ que resulta ser candidato a solución (y que debe ser mejor que el mejor que pudiéramos haber encontrado antes debido a la poda anterior), al volver al predecesor del nivel $s$ (DFS) no tiene sentido seguir probando con el resto de los sucesores pues no pueden dar candidatos a soluciones mejores que de tamaño $s+1$.
 \end{enumerate}
 
+La diferencia entre la poda 1 y 2 puede resultar un tanto sútil pero será más clara cuando veamos la implementación de \textit{backtracking}.
+
 \subsubsection{Pseudocódigo}
   \paragraph{Variables globales:} Para tratar el problema definimos cuatro variables globales:
   \begin{itemize}
-    \item \texttt{Vector(<int, int>)} $puntos$: almacena el conjunto de puntos. Dado que lo guardamos en un vector, se está imponiendo un orden sobre los puntos. Y como $puntos$ no se modifica nunca en el transcurso del programa, aprovecharemos dicho orden para referirnos a cada punto por el entero que representa su posición en $puntos$.
+    \item \texttt{Vector(<int, int>)} $puntos$: almacena el conjunto de puntos. Dado que lo guardamos en un vector, se está imponiendo un orden sobre los puntos. Y como $puntos$ no se modifica nunca en el transcurso del programa (al menos después de inicializarlo), aprovecharemos dicho orden para referirnos a cada punto por el entero que representa su posición en $puntos$.
     \item \texttt{int} $n$: cantidad de puntos.
     \item \texttt{int} $mejor$: guarda el tamaño de la mejor partición hallada hasta el momento.
     \item \texttt{Vector(Vector(int))} $mejor\_sol$: guarda la mejor partición encontrada hasta el momento.
   \end{itemize}
   \paragraph{Clase Tablero:} La estructura \texttt{Tablero} nos permite condensar bien la información de la solución parcial que estamos desarrollando en un determinado momento junto con lo que necesitamos saber para hallar a sus sucesores. Las tres variables internas que tiene son:
   \begin{itemize}
-    \item \texttt{Vector(Vector(int))} $solucion$: almacena una candidata solución parcial hallada hasta el momento. Es decir que eventualmente $solucion$ es una partición de $puntos$, que puede ser efectivamente o no solución del problema planteado.
+    \item \texttt{Vector(Vector(int))} $solucion$: almacena una candidata a solución parcial hallada hasta el momento. Es decir que eventualmente $solucion$ es una partición de $puntos$, que puede ser efectivamente o no solución del problema planteado.
     \item \texttt{Vector(bool)} $vivos$: tiene tamaño $n$. $vivos[i] = true \Leftrightarrow$ el punto $i$ todavía no fue agregado en algún conjunto de $solucion$.
     \item \texttt{int} $cant\_vivos$: cantidad de puntos que todavía no fueron añadidos a $solucion$.
   \end{itemize}
 
   En cuanto a las funciones miembro de la clase, consideramos que el código es lo suficientemente simple y los nombres lo suficientemente descriptivos como para que sea necesaria una explicación detallada de cada uno.
 
-  \paragraph{Función \texttt{solve}}
+  \paragraph{Función \texttt{solve}:} Es una función \textit{wrapper}, que se encarga esencialmente de llamar a la función $backtracking$, pasándole el tablero inicial correspondiente al nivel 0 del árbol de posibilidades (en el  que el candidato a solución parcial está vacío y tenemos todas las posibilidades disponibles). También se encarga de devolver la solución del problema.
 
   \begin{algorithm}[H]
   \begin{algorithmic}
@@ -107,10 +121,20 @@ Una estrategia básica, basada en lo observado en la sección \ref{subsec:proble
   \end{algorithmic}
   \end{algorithm}
 
-  \paragraph{Función de \texttt{backtracking}}
+  \paragraph{Función de \texttt{backtracking}:} Es la función más importante de la solución. Toma como parámetros un Tablero $t$ y un entero $step$, que cumplen que el tamaño de $t.solucion$ es $step$.
+
+  En las líneas 2 y 3 del pseudocódigo estamos realizando la primer poda: si el tamaño de $t.solucion$ (candidata a solución parcial) es mayor o igual que el de la mejor candidata a solución encontrada hasta el momento, entonces no continuamos analizando esta rama del árbol. Caso contrario, verificamos si ya tenemos completa la partición correspondiente. De serlo, por la poda anterior, estamos seguros de que es mejor que cualquier cosa que hubiéramos encontrado antes y por lo tanto actualizamos nuestras variables globales. 
+
+  Si $t.solucion$ todavía no está completa, entonces queremos hallar todos los sucesores de $t$\footnote{Si bien definimos sucesor para hablar específicamente de las particiones resulta práctico usarlo en un sentido más amplio para hablar del tablero entero.}. Notar que tenemos dos sucesores por cada par de puntos disponibles (como se trata con semirrectas el orden si importa), pues únicamente consideramos semirrectas que pasen por al menos  dos puntos. Si solo quedase un punto entonces simplemente agregamos el conjunto que lo contiene a la solución parcial y obtenemos un candidato a solución. 
+
+  Para recorrer todas estas posibilidades hacemos lo siguiente por cada punto disponible $i$: si es el único, agregamos el conjunto que solo lo contiene a él, y llamamos a $backtracking$ con el tablero actualizado y $step+1$; luego, retornamos. Si no era el único, entonces existe al menos un punto más con el que seguro se puede trazar una semirrecta. Por cada uno de estos puntos $j$, buscamos que otros puntos disponibles pertenecen a la semirrecta definida por $i$ y $j$ con origen en $i$. A todos estos puntos (incluidos $i$ y $j$) los metemos en un conjunto, y generamos un sucesor de $t$ que resulta de a una copia del mismo agregarle este conjunto nuevo\footnote{Notar que es fundamental que sea una copia de $t$, pues del mismo queremos obtener todos los posibles sucesores y por lo tanto no podemos modificarlo directamente.}. Finalmente, llamamos recursivamente a $backtracking$ con el sucesor y $step+1$.
+
+  El procedimiento que realizamos para determinar si un punto $k$ pertenece a la semirrecta con origen en $i$ que pasa por $j$ es, por un lado ver si pertenece a la recta que pasa por $i$ y $j$, y luego ver si $k$ y $j$ están en el mismo cuadrante respecto de $i$ (un poco más adelante profundizamos esto útlimo). Notar que si $i$ y $j$ están alineados vertical (mismo $x$) u horizontalmente (mismo $y$), no se puede aplicar la fórmula clásica para determinar si un tercer punto pertenece a una recta dada por dos: $\frac{x_k-x_i}{x_j-x_i} = \frac{y_k-y_i}{y_j-y_i}$. Por lo tanto esos dos casos los analizamos a parte (el código usado para eso es muy simple de entender).
+
+  Notemos que las líneas 25 y 26 aportan la segunda poda mencionada en la subsección anterior. La idea es que si al volver del llamado recursivo $mejor = s+1$, entonces no tiene sentido continuar ejecutando los ciclos pues todos los sucesores de $t$ van a ser de tamaño $s+1$ y por lo tanto no pueden mejorar lo que ya encontré. Podría parecer que esto se pisa con la condición de la línea 2 pero en rigor lo que nos ahorramos con la 25 es el costo de construir sucesores destinados a fracasar, cosa que no lográbamos de otra manera. Esto es particularmente útil en el mejor caso del algoritmo como veremos luego.
   
   \begin{algorithm}[H]
-  \begin{algorithmic}
+  \begin{algorithmic}[1]
   \label{algo:backtracking}
   \caption{Pseudocódigo del procedimiento de \texttt{backtracking} en Kamehameha}
     \Procedure{backtracking}{\texttt{Tablero} $t$, \texttt{int} $step$}
@@ -146,14 +170,14 @@ Una estrategia básica, basada en lo observado en la sección \ref{subsec:proble
             \Comment $O(1)$
               \If {$\frac{x_k-x_i}{x_j-x_i} = \frac{y_k-y_i}{y_j-y_i} \land MismoCuadrante?(i,j,k)$}
               \Comment $O(1)$
-                \State $derrotados.AgregarAtras(k)$
-                \Comment $O(n)$
+                \State $derrotados.push\_back(k)$ 
+                \Comment $O(1)$ \footnotemark
               \EndIf
             \Else 
               \If {\footnotesize $(AlinHor?(i,j,k) \lor AlinVer?(i,j,k)) \land MismoCuadrante?(i,j,k)$}
               \Comment {\footnotesize $O(1)$}\normalsize
-                \State $derrotados.AgregarAtras(k)$
-                \Comment $O(n)$
+                \State $derrotados.push_back(k)$
+                \Comment $O(1)$
               \EndIf
             \EndIf
           \EndFor
@@ -171,7 +195,9 @@ Una estrategia básica, basada en lo observado en la sección \ref{subsec:proble
   \end{algorithmic}
   \end{algorithm}
 
-  \paragraph{Función \texttt{mismoCuadrante}}
+  \footnotetext{En general, hacer push\_back a un vector tiene peor caso $n$. Sin embargo en el código usamos la función reserve (\url{http://www.cplusplus.com/reference/vector/vector/reserve/}) que permite que la operación sea constante siempre que no agreguemos más de $n$ elementos, cosa que obviamente no puede ocurrir.}
+
+  \paragraph{Función \texttt{mismoCuadrante}:} Su código en si no es particularmente interesante, lo importante es entender la idea. El punto $i$ es el origen de la semirrecta que estamos analizando. En particular, podemos pensar que este punto genera cuatro cuadrantes respecto de él (del mismo modo que lo hace el origen de coordenadas). Por lo tanto, lo que hace esta función es chequear si los puntos $j$ y $k$ están en el mismo cuadrante respecto de $i$. Si no lo estuvieran, entonces por más que estén alineados no pueden pertenecer a la misma semirrecta con origen en $i$.
 
 \subsection{Complejidad del algoritmo}
 \subsubsection{Complejidad en peor caso}
@@ -179,8 +205,8 @@ El peor caso como vimos es cuando no hay tres o más puntos alineados. En tal si
 
 La complejidad total del algoritmo es la complejidad de \texttt{solve}, $O(n + T(n)) = O(max{n, T(n)})$. Veamos entonces cuál es la cota superior de complejidad en peor caso de \texttt{backtracking}. 
 
-\subsubsection{Ecuación de recurrencia}
-Primero debemos dar la ecuación de recurrencia, $T$, para la cantidad de operaciones que realiza $backtracking$ con un input de tamño $n$ en el peor caso. Tal ecuación, basados en las complejidades anotadas en el algoritmo \ref{algo:backtracking}, es la siguiente
+\paragraph{Ecuación de recurrencia}
+Primero debemos dar la ecuación de recurrencia, $T$, para la cantidad de operaciones que realiza $backtracking$ con un input de tamaño $n$ en el peor caso. Tal ecuación, basados en las complejidades anotadas en el algoritmo \ref{algo:backtracking}, es la siguiente
 
 \begin{equation}
  \label{eq:aqui-le-mostramos-como-hacerle-la-llave-grande}
@@ -205,7 +231,7 @@ A continuación damos una fórmula cerrada para esta ecuación de recurrecia cua
 
 Una demostración de este lema puede encontrarse en el apéndice.
 
-  Ahora acotemos $F(n)$:
+  Ahora acotemos $F(n)$, con $n \geq 2$:
   \begin{equation}
   \begin{aligned}
   F(n) &= \sum_{i=0}^{\frac{n}{2}-1} \left((n-2i) \prod_{j=0}^{i}(n-2j)^2\right) + \prod_{i=0}^{\frac{n}{2}-1}(n-2i)^2 \\
@@ -217,7 +243,17 @@ Una demostración de este lema puede encontrarse en el apéndice.
   \end{aligned}
   \end{equation}
 
-  Finalmente $F(n) = T(n)$ es $O(n^n)$ por lo que también es $O(n^{n+2})$, que era la complejidad pedida. 
+  Como $n \geq 2$, esto último está bien definido (solo se invalida en 0).
+
+  Luego, por definición de $O$, $F(n) = T(n)$ es $O(n^n)$. Como $n^n\leq n^{n+2} (\forall n \in \mathbb{N})$, entonces $O(n^n)\subset O(n^{n+2})$, y $T\in O(n^{n+2})$, que era la complejidad pedida. $\qed$
+
+\subsubsection{Complejidad en mejor caso}
+
+El mejor caso es indudablemente el caso en que todos los puntos están alineados y el primer punto del vector $puntos$ es uno de los puntos extremos, es decir que basta con una semirrecta con origen en ese punto para atravesar todos. En tal situación, solo se entrará una vez a los ciclos de las líneas 8 y 13 (esto es debido a la segunda poda), y $n$ al de la 16.
+
+Si hacemos el seguimiento línea por línea en el pseudocódigo, vemos que la complejidad total será $O(1+n+2+1+(2n+1)+1+3\times n+n+1+n) = O(n)$, por álgebra de órdenes.
+
+Notar que si la línea 25 no estuviera, pese a haber encontrado obviamente la mejor solución posible, se seguiría iterando sobre todos los sucesores, con lo que la complejidad terminaría siendo $O(n^3)$. 
 
 \subsection{Performance del algoritmo}
 
