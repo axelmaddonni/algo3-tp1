@@ -9,7 +9,7 @@
 int mejor;
 vector<vector<int>> mejor_sol;
 std::vector<pair<int, int>> puntos;
-int n = puntos.size();
+int n;
 
 bool mismo_cuadrante(pair<int, int> pi, pair<int, int> pj, pair<int, int> pk) {
   int x_i = pi.first;
@@ -19,8 +19,8 @@ bool mismo_cuadrante(pair<int, int> pi, pair<int, int> pj, pair<int, int> pk) {
   int x_k = pk.first;
   int y_k = pk.second;
 
-  if((x_j - x_i >= 0 && x_k - x_i >= 0) || (x_j - x_i <= 0 && x_k - x_i <= 0)){
-    if((y_j - y_i >= 0 && y_k - y_i >= 0) || (y_j - y_i <= 0 && y_k - y_i <= 0)){
+  if((x_j >= x_i && x_k >= x_i) || (x_j <= x_i && x_k <= x_i)){
+    if((y_j >= y_i && y_k >= y_i) || (y_j <= y_i && y_k <= y_i)){
       return true;
     }
   }
@@ -48,6 +48,7 @@ void backtracking(Tablero t, int s) {
             std::vector<int> derrotados;
             derrotados.push_back(i);
             derrotados.push_back(j);
+            derrotados.reserve(n);
             double x_i = puntos[i].first;
             double y_i = puntos[i].second;
             double x_j = puntos[j].first;

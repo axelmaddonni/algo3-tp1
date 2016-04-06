@@ -1,0 +1,49 @@
+\subsection{Demostración del Lema 3.1}
+
+Vamos a demostrar que $T(n) = F(n)$, si $n=2k$ con $k\in\mathbb{N}$, por inducción en $k$.
+
+\textbf{Caso base:} $k=0 \implies n=0$
+
+  $T(0) = 1$ 
+
+  Dado que las sumatorias y las productorias en las que el límite inferior es más grande que el superior se devuelve el elemento neutro para la suma y el producto, 0 y 1 respectivamente, tenemos que $F(0) = 1$. Entonces demostramos el caso base.
+
+\textbf{Paso inductivo:} Supongamos que $T(n) = F(n)$. Veamos que también vale $T(n + 2) = F(n + 2)$ \\
+  \begin{equation}
+  \label{eq:ind3-1}
+  \begin{aligned}
+  T(n+2) &= (n+2)^3 + (n+2)^2 T(n) \\
+         &= (n+2)^3 + (n+2)^2 F(n) \\
+         &= (n+2)^3 + (n+2)^2 \sum_{i=0}^{\frac{n}{2}-1} \left((n-2i) \prod_{j=0}^{i}(n-2j)^2\right) + (n+2)^2 \prod_{i=0}^{\frac{n}{2}-1}(n-2i)^2\\
+         &= (n+2)^3 + \sum_{i=0}^{\frac{n}{2}-1} \left((n-2i) (n+2)^2 \prod_{j=0}^{i}(n-2j)^2\right) + (n+2)^2 \prod_{i=0}^{\frac{n}{2}-1}(n-2i)^2
+  \end{aligned}
+  \end{equation}
+
+  Por otro lado tenemos
+
+  $F(n+2) = \sum_{i=0}^{\frac{n}{2}} \left((n+2-2i) \prod_{j=0}^{i}(n+2-2j)^2\right) + \prod_{i=0}^{\frac{n}{2}}(n+2-2i)^2$
+
+  Ahora hagamos un par de observaciones:
+
+  \begin{equation}
+  \label{eq:ind3-2}
+  \begin{aligned}
+  (n+2)^2 \prod_{j=0}^{i}(n-2j)^2
+  &= (n+2)^2 \prod_{t=1}^{i+1}(n-2(t-1))^2\\
+  &= (n+2)^2 \prod_{t=1}^{i+1}(n+2-2t))^2\\
+  &= \prod_{t=0}^{i+1}(n+2-2t)^2 
+  \end{aligned}
+  \end{equation}
+
+  \begin{equation}
+  \label{eq:ind3-3}
+  \begin{aligned}
+  (n+2)^3 + \sum_{i=0}^{\frac{n}{2}-1} \left((n-2i) \prod_{t=0}^{i+1}(\hdots)\right)
+  &= (n+2)^3 + \sum_{r=1}^{\frac{n}{2}} \left((n-2(r-1)) \prod_{t=0}^{r}(\hdots)\right) \\
+  &= (n+2)^3 + \sum_{r=1}^{\frac{n}{2}} \left((n+2-2r)) \prod_{t=0}^{r}(\hdots)\right) \\
+  &= \sum_{r=0}^{\frac{n}{2}} \left((n+2-2r)) \prod_{t=0}^{r}(\hdots)\right)
+  \end{aligned}
+  \end{equation}
+
+  Notar que la igualdad \ref{eq:ind3-2} puede instanciarse para $i = \frac{n}{2}-1$. 
+  Aplicando las igualdades \ref{eq:ind3-2} (dos veces) y \ref{eq:ind3-3} sobre la ecuación \ref{eq:ind3-1}, llegamos a que $T(n + 2) = F(n + 2)$. $\qed$
