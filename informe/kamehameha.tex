@@ -26,13 +26,13 @@ Por ejemplo, consideremos $C=\{(3,2), (3,5), (3,7), (5,6), (7,4)\}$. Tomemos la 
 \begin{figure}[H]
   \centering
   \begin{minipage}{0.49\textwidth}
-  \includegraphics[width=0.75\textwidth]{img/ejemplos/ej3-3.pdf}
+  \includegraphics[width=0.85\textwidth]{img/ejemplos/ej3-3.pdf}
   \caption{\footnotesize Solución óptima para un conjunto dado de 5 puntos, donde no hay 3 puntos alineados.}
   \label{fig:ej3-3}
   \end{minipage}%
   \hspace{0.01\textwidth}
   \begin{minipage}{0.49\textwidth}
-  \includegraphics[width=0.75\textwidth]{img/ejemplos/ej3-4.pdf}
+  \includegraphics[width=0.85\textwidth]{img/ejemplos/ej3-4.pdf}
   \caption{\footnotesize Solución óptima para un conjunto dado de 5 puntos, donde no hay 3 puntos alineados.}
   \label{fig:ej3-4}
   \end{minipage}%
@@ -44,7 +44,7 @@ Por lo dicho en el párrafo anterior, se puede establecer una cota superior al c
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.70\textwidth]{img/ejemplos/ej3-5.pdf}
+  \includegraphics[width=0.80\textwidth]{img/ejemplos/ej3-5.pdf}
   \caption{\footnotesize Solución óptima para un conjunto de 16 puntos dispuestos sobre una circunferencia de radio 2 centrada en $(3,3)$.}
   \label{fig:ej3-5}
 \end{figure}
@@ -64,45 +64,106 @@ La correctitud de tal algoritmo es clara pues encuentra todo el universo de posi
 La idea de \texttt{backtracking} es preservar esta garantía de correctitud pero agilizando la búsqueda mediante la utilización de podas en el árbol de posibilidades. Dicho de otra forma, un algoritmo de este tipo descarta \texttt{candidatos a soluciones parciales} que a partir de algún criterio podemos predecir que no nos van a conducir a la solución. En nuestro problema, un candidato a solución parcial es una partición en construcción. En la siguiente sección mostramos con que criterios los descartamos.
 
 \subsubsection{Podas realizadas}
+Una estrategia básica, basada en lo observado en la sección \ref{subsec:problema3}, es no considerar agregar conjuntos que tienen un solo elemento, salvo potencialmente en el último paso. Además, planteamos dos podas:
+
 \begin{enumerate}
   \item Si actualmente estamos parados en un nodo de nivel $s$ (es decir que el cardinal de nuestro candidato a solución parcial es $s$) y anteriormente ya habíamos encontrado una solución en el nivel $s$, entonces no tiene sentido continuar por ese camino pues sabemos que todas los candidatos a soluciones a los que se arrive van a ser peores que un candidato previamente encontrado. De esta forma estamos ahorrándonos una búsqueda innecesaria y potencialmente muy costosa.
-  \item Por lo observado en la sección \ref{subsec:problema3}, no tiene sentido considerar agregar conjuntos que tienen un solo elemento, salvo potencialmente en el último paso. Esto elimina muchas ramas del árbol.
+  \item Si actualmente estamos parados en un nodo de nivel $s$, y nos movemos a un sucesor en el nivel $s+1$ que resulta ser candidato a solución (y que debe ser mejor que el mejor que pudiéramos haber encontrado antes debido a la poda anterior), al volver al predecesor del nivel $s$ (DFS) no tiene sentido seguir probando con el resto de los sucesores pues no pueden dar candidatos a soluciones mejores que de tamaño $s+1$.
 \end{enumerate}
 
 \subsubsection{Pseudocódigo}
+  \paragraph{Variables globales:} Para tratar el problema definimos cuatro variables globales:
+  \begin{itemize}
+    \item \texttt{Vector(<int, int>)} $puntos$: almacena el conjunto de puntos. Dado que lo guardamos en un vector, se está imponiendo un orden sobre los puntos. Y como $puntos$ no se modifica nunca en el transcurso del programa, aprovecharemos dicho orden para referirnos a cada punto por el entero que representa su posición en $puntos$.
+    \item \texttt{int} $n$: cantidad de puntos.
+    \item \texttt{int} $mejor$: guarda el tamaño de la mejor partición hallada hasta el momento.
+    \item \texttt{Vector(Vector(int))} $mejor\_sol$: guarda la mejor partición encontrada hasta el momento.
+  \end{itemize}
+  \paragraph{Clase Tablero:} La estructura \texttt{Tablero} nos permite condensar bien la información de la solución parcial que estamos desarrollando en un determinado momento junto con lo que necesitamos saber para hallar a sus sucesores. Las tres variables internas que tiene son:
+  \begin{itemize}
+    \item \texttt{Vector(Vector(int))} $solucion$: almacena una candidata solución parcial hallada hasta el momento. Es decir que eventualmente $solucion$ es una partición de $puntos$, que puede ser efectivamente o no solución del problema planteado.
+    \item \texttt{Vector(bool)} $vivos$: tiene tamaño $n$. $vivos[i] = true \Leftrightarrow$ el punto $i$ todavía no fue agregado en algún conjunto de $solucion$.
+    \item \texttt{int} $cant\_vivos$: cantidad de puntos que todavía no fueron añadidos a $solucion$.
+  \end{itemize}
+
+  En cuanto a las funciones miembro de la clase, consideramos que el código es lo suficientemente simple y los nombres lo suficientemente descriptivos como para que sea necesaria una explicación detallada de cada uno.
+
+  \paragraph{Función \texttt{solve}}
+
   \begin{algorithm}[H]
   \begin{algorithmic}
+  \caption{Pseudocódigo del procedimiento de \texttt{solve} en Kamehameha}
+    \Procedure{solve}{\texttt{Vector(<int, int>)} $ptos$}$\rightarrow$ \texttt{Vector(Vector(int))}
+      \State $Puntos\gets ptos$
+      \Comment $O(n)$
+      \State \texttt{Tablero} $inicial \gets Tablero()$
+      \Comment $O(n)$
+      \State $mejor \gets puntos.size()$
+      \Comment $O(1)$
+      \State $backtracking(inicial,0)$
+      \Comment $O(T(n))$
+      \State $return$ $mejor\_sol$
+    \EndProcedure
+  \end{algorithmic}
+  \end{algorithm}
+
+  \paragraph{Función de \texttt{backtracking}}
+  
+  \begin{algorithm}[H]
+  \begin{algorithmic}
+  \label{algo:backtracking}
   \caption{Pseudocódigo del procedimiento de \texttt{backtracking} en Kamehameha}
-    \Procedure{backtracking}{Tablero $t$, int $step$}
+    \Procedure{backtracking}{\texttt{Tablero} $t$, \texttt{int} $step$}
     \If {$step \geq mejor$}
+    \Comment $O(1)$
       \State $return$
     \EndIf
     \If {$t.Solucionado()$}
+    \Comment $O(n)$
       \State $mejor \gets step$
+      \Comment $O(1)$
       \State $mejor\_sol \gets t.Solucion()$
+      \Comment $O(n)$
     \Else
       \For {$i \in [0,..., n),$ $t.EstaVivo?(i)$}
+      \Comment $n$ veces
         \If {$t.SoloQuedaUno?()$}
+        \Comment $O(1)$
           \State $t.Matar(i)$
+          \Comment $O(n)$
           \State $backtracking(t, step+1)$
           \State $return$
         \EndIf
         \For {$j \in [0,..., n),$ $j \neq i \land t.EstaVivo?(j)$}
-          \State $Tablero$ $sucesor \gets Copiar(t)$
-          \State $Vector(int)$ $derrotados \gets [i, j]$ 
+          \Comment $n$ veces
+          \State \texttt{Tablero} $sucesor \gets Copiar(t)$
+          \Comment $O(2n+1)$
+          \State \texttt{Vector(int)} $derrotados \gets [i, j]$
+          \Comment $O(1)$ 
           \For {$k \in [0,..., n),$ $k \neq i \land k \neq j \land t.EstaVivo?(k)$}
+          \Comment $n$ veces
             \If {$x_i \neq x_j \land y_i \neq y_j$}
+            \Comment $O(1)$
               \If {$\frac{x_k-x_i}{x_j-x_i} = \frac{y_k-y_i}{y_j-y_i} \land MismoCuadrante?(i,j,k)$}
+              \Comment $O(1)$
                 \State $derrotados.AgregarAtras(k)$
+                \Comment $O(n)$
               \EndIf
             \Else 
-              \If {\small{$(AlinHor?(i,j,k) \lor AlinVer?(i,j,k)) \land MismoCuadrante?(i,j,k)$}}
+              \If {\footnotesize $(AlinHor?(i,j,k) \lor AlinVer?(i,j,k)) \land MismoCuadrante?(i,j,k)$}
+              \Comment {\footnotesize $O(1)$}\normalsize
                 \State $derrotados.AgregarAtras(k)$
+                \Comment $O(n)$
               \EndIf
             \EndIf
           \EndFor
           \State $sucesor.Matar(derrotados)$
+          \Comment $O(n)$
           \State $backtracking(sucesor, step+1)$
+          \If {$mejor = s+1$}
+            \Comment $O(1)$
+            \State $return$
+          \EndIf
         \EndFor
       \EndFor
     \EndIf
@@ -110,37 +171,107 @@ La idea de \texttt{backtracking} es preservar esta garantía de correctitud pero
   \end{algorithmic}
   \end{algorithm}
 
+  \paragraph{Función \texttt{mismoCuadrante}}
+
 \subsection{Complejidad del algoritmo}
+\subsubsection{Complejidad en peor caso}
+El peor caso como vimos es cuando no hay tres o más puntos alineados. En tal situación la partición solo estará compuesta por conjuntos de dos puntos (y uno de un elemento si $n$ es impar), por lo que tendrá cardinalidad igual a $\frac{n}{2}$. Por lo tanto, todas las hojas de nuestro árbol estarán a distancia $\frac{n}{2}$ de la raíz. Entonces nuestro algoritmo recorrerá todas las ramas hasta el fondo. Bueno, en rigor esto no es exactamente así debido a las podas. No obstante omitiremos ese detalle en el cálculo de la complejidad, y asumiremos la primer situación pues es al menos tan mala y por lo tanto permite acotar la complejidad de nuestro algoritmo.
+
+La complejidad total del algoritmo es la complejidad de \texttt{solve}, $O(n + T(n)) = O(max{n, T(n)})$. Veamos entonces cuál es la cota superior de complejidad en peor caso de \texttt{backtracking}. 
+
+\subsubsection{Ecuación de recurrencia}
+Primero debemos dar la ecuación de recurrencia, $T$, para la cantidad de operaciones que realiza $backtracking$ con un input de tamño $n$ en el peor caso. Tal ecuación, basados en las complejidades anotadas en el algoritmo \ref{algo:backtracking}, es la siguiente
+
+\begin{equation}
+ \label{eq:aqui-le-mostramos-como-hacerle-la-llave-grande}
+ T(n) = \left\{
+     \begin{array}{ll}
+ 1      & \mathrm{si\ } n = 0 \\
+ 9      & \mathrm{si\ } n = 1 \\
+ n^3 + n^2\times T(n-2)     & \mathrm{si\ } n \geq 2
+     \end{array}
+   \right.
+\end{equation}
+
+A continuación damos una fórmula cerrada para esta ecuación de recurrecia cuando $n$ es par\footnote{Para $n$ impar puede obtenerse una fórmula muy parecida, reemplazando el $T(0)$ por $T(1)$ y cambiando $\frac{n}{2}$ por $\frac{n-1}{2}$. Para evitar sobrecargar la demostración nos limitamos al caso par pero el impar es análogo.}:
+
+\paragraph{Lema 3.1:} 
+\begin{equation}
+\begin{aligned}
+  F(n) &= \sum_{i=0}^{\frac{n}{2}-1} \left((n-2i) \prod_{j=0}^{i}(n-2j)^2\right) + \left(\prod_{i=0}^{\frac{n}{2}-1}(n-2i)^2\right) T(0)\\
+  &= \sum_{i=0}^{\frac{n}{2}-1} \left((n-2i) \prod_{j=0}^{i}(n-2j)^2\right) + \prod_{i=0}^{\frac{n}{2}-1}(n-2i)^2
+\end{aligned}
+\end{equation}
+
+Una demostración de este lema puede encontrarse en el apéndice.
+
+  Ahora acotemos $F(n)$:
+  \begin{equation}
+  \begin{aligned}
+  F(n) &= \sum_{i=0}^{\frac{n}{2}-1} \left((n-2i) \prod_{j=0}^{i}(n-2j)^2\right) + \prod_{i=0}^{\frac{n}{2}-1}(n-2i)^2 \\
+  &\leq \sum_{i=0}^{\frac{n}{2}-1} \left(n \prod_{j=0}^{i}n^2\right) + \prod_{i=0}^{\frac{n}{2}-1}n^2 \\
+  &= \sum_{i=0}^{\frac{n}{2}-1} (n^{2i+1}) + n^{2\times(\frac{n}{2}-1)} \\
+  &= \sum_{i=0}^{\frac{n}{2}-2} (n^{2i+1}) + n^{n-1} + n^{n-2} \\
+  &\leq \frac{n}{2} n^{n-1} + n^{n-1}\\
+  &\leq \frac{3}{2} n^{n}
+  \end{aligned}
+  \end{equation}
+
+  Finalmente $F(n) = T(n)$ es $O(n^n)$ por lo que también es $O(n^{n+2})$, que era la complejidad pedida. 
 
 \subsection{Performance del algoritmo}
 
-\begin{figure}[H]
- \centering
-	\includegraphics[width=0.9\textwidth]{img/tiempos/kamehameha2.pdf}
-	\caption{\footnotesize Tiempo que toma el algoritmo en $\mu$s para una entrada de tamaño $n$.}
-	\label{fig:kamehameha-tiempos2}
-\end{figure}
+Como vimos anteriormente, el algoritmo tiene una complejidad de $O(n^{n+2})$. Sin embargo, esta cota no era ajustada. Veamos si esto se refleja en la realidad. El primer caso que analizaremos es el peor caso, es decir, aquel en el que siempre se necesitan $\frac{n}{2}$ rectas, el máximo posible.
 
 \begin{figure}[H]
  \centering
-	\includegraphics[width=0.9\textwidth]{img/tiempos/kamehameha1.pdf}
+	\includegraphics[width=0.8\textwidth]{img/tiempos/kamehameha1.pdf}
 	\caption{\footnotesize Tiempo que toma el algoritmo en $\mu$s para una entrada de tamaño $n$.}
 	\label{fig:kamehameha-tiempos1}
 \end{figure}
 
+Como puede verse, el tiempo requerido por el algoritmo crece muy aceleradamente, razón por la cual debimos analizarlo hasta $n = 12$, para el cual cada corrida tardaba alrededor de 15 minutos (Nótese que si $n = 12$, entonces $n^{n+2} \equiv 10^15$).
+
+Como este es el peor caso, la poda no contribuye en nada, dado que hay que recorrer cada posibilidad de entre todas las combinaciones. Esto se refleja claramente en el gráfico.
+
+Analicemos ahora el caso promedio.
+
 \begin{figure}[H]
  \centering
-	\includegraphics[width=0.9\textwidth]{img/tiempos/kamehameha3.pdf}
+	\includegraphics[width=0.8\textwidth]{img/tiempos/kamehameha2.pdf}
+	\caption{\footnotesize Tiempo que toma el algoritmo en $\mu$s para una entrada de tamaño $n$.}
+	\label{fig:kamehameha-tiempos2}
+\end{figure}
+
+Como puede verse en la figura \ref{fig:kamehameha-tiempos2}, el caso promedio es muy similar al peor caso. Esto se debe, a que lo mas probable es que se necesiten $\frac{n}{2}$ rectas para cubrir a todos los puntos. Esto se prueba en el ap\'endice.
+
+Por último, analicemos el mejor caso. El mejor caso es, obviamente, en el que se necesita una sola recta para cubrir a todos los puntos, y esta recta se encuentra en el primer intento. Como vimos antes, en este caso la complejidad del algoritmo es de $O(n)$. Veamos si esto se confirma experimentalmente.
+
+\begin{figure}[H]
+ \centering
+	\includegraphics[width=0.8\textwidth]{img/tiempos/kamehameha3.pdf}
 	\caption{\footnotesize Tiempo que toma el algoritmo en $\mu$s para una entrada de tamaño $n$.}
 	\label{fig:kamehameha-tiempos3}
 \end{figure}
 
 \begin{figure}[H]
  \centering
-	\includegraphics[width=0.9\textwidth]{img/tiempos/kamehameha4.pdf}
+	\includegraphics[width=0.8\textwidth]{img/tiempos/kamehameha4.pdf}
 	\caption{\footnotesize Tiempo que toma el algoritmo en $\mu$s para una entrada de tamaño $n$.}
 	\label{fig:kamehameha-tiempos4}
 \end{figure}
 
+Efectivamente, se ve que la complejidad del algoritmo es de $O(n)$. La disminución del tiempo de ejecución alrededor de $n = 8200$ no pudo ser explicada por nosotros. Dado que 8192 es una potencia de 2, podemos inferir que tiene que ver con un tema de \emph{cache} al almacenar los datos en memoria.
 
+\subsubsection{M\'etodo de experimentación}
 
+Para el peor caso, para asegurarnos que siempre se requirieran exactamente $\frac{n}{2}$ rectas para cubrir todos los puntos. Para esto lo que hicimos fue tomar $n$ puntos sobre una circunferencia (específicamente, sobre la circunferencia de radio $\frac{n}{2}$ con centro en el $(n,n)$). Nótese que (por la definición de circunferencia) no hay 3 puntos en la misma recta, por lo tanto necesitaremos $\frac{n}{2}$ rectas para cubrir todos los puntos.
+
+El caso promedio se genera de manera similar al problema anterior. Para cada $n$, elegimos $n$ puntos al azar de la grilla $\{1,..., n^2\} \times \{1, ... , n^2\}$.
+
+Estos puntos eran elegidos al azar usando el mismo \emph{seed} cada vez (para la instancia 1 usabamos 1 como seed, para la instancia 2, usabamos 2, etc.), de tal manera que los experimentos fueran reproducibles de una manera válida.
+La cantidad de instancias que creamos para cada $n$ fue 40.
+Cada instancia fue ejecutada 20 veces, y el resultado final era el mínimo de todas las corridas.
+Luego, tomabamos la mediana de todas las instancias. Es decir, el restultado final es la mediana de los mínimos.
+
+Finalmente, para el mejor caso, el caso de tamaño $n$ estará formado por los puntos $\{(1,1), (2,2), \cdots, (n, n)\}$, en ese orden, de tal manera que el backtracking tome a los puntos $(1,1)$ y $(2,2)$ en su primer intento, y ese intento sea el exitoso.
