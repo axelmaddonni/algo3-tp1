@@ -26,12 +26,11 @@ def generar1(tamanio_muestra):
     f = open(archivo, "w")
     f.write(str(tamanio_muestra))
 
-def generar2(tamanio_muestra):
+def generar2(tamanio_muestra, t):
     f = open(archivo, "w")
     n = tamanio_muestra
-    MAXIMO_T = n
     MAXIMA_COORD = n*n
-    f.write(str(n) + " " + str(random.randint(1, MAXIMO_T)) + "\n")
+    f.write(str(n) + " " + str(t) + "\n")
     xs = random.sample(range(MAXIMA_COORD), n)
     ys = random.sample(range(MAXIMA_COORD), n)
     xs.sort(reverse = True)
@@ -103,14 +102,15 @@ def tiempo_normalizado(problema, tiempo, n):
 
 def encontrar_k(problema, puntos):
     ks = []
-    puntos = puntos[1:-6]
-
     for n, tiempo in puntos:
+        if n == 0:
+            continue
+        print tiempo, n, tiempo_normalizado(problema, tiempo, n)
         ks.append(tiempo_normalizado(problema, tiempo, n))
-    return mean(ks)
+    return median(ks)
 
 
-def main():
+def main3():
     datos = []
     posiciones = []
     for tamanio_muestra in range(0, ultimo, granularidad):
@@ -119,7 +119,7 @@ def main():
         posiciones.append(float(tamanio_muestra))
         tiempos = []
         for seed in range(cantidad_muestras):
-            mediciones = 10
+            mediciones = 1
             mediciones_vector = []
             random.seed(seed)
             if problema == 1:
@@ -135,7 +135,7 @@ def main():
     plt.figure()
     puntos = zip(map(float, posiciones), map(median, datos))
     #k = encontrar_k(problema, puntos)
-    k = 0.05
+    k = 0.026
     fit = []
     if problema == 1:
         fit = map(lambda n: k * n * math.log(n), posiciones)
@@ -148,12 +148,12 @@ def main():
     print fit
 
     posiciones_ints = map(int, posiciones)
-    plt.plot(posiciones_ints, map(lambda (n, tiempo): tiempo,
+    plt.plot(posiciones_ints, map(lambda (n, tiempo): tiempo / n if tiempo - (k*n + 10) < 30 else k,
         zip(posiciones_ints, map(median, datos))), label="Algoritmo con poda")
     plt.legend(loc=2)
     plt.xlabel("Tamano de la entrada")
-    plt.ylabel("Tiempo (us)")
-    #plt.ylim([0, 0.1])
+    plt.ylabel("Tiempo (us) / n")
+    plt.ylim([0, 0.1])
     """
     posiciones_ints = map(int, posiciones)
     plt.plot(posiciones_ints, map(median, datos),
@@ -168,9 +168,60 @@ def main():
     plt.xlabel("Tamano de la entrada")
     plt.ylabel("Tiempo (us)")
     """
-    #plt.savefig("foo.pdf")
+    plt.savefig("foo.pdf")
+    plt.show()
+
+def main2():
+    datos = [[], [], [], []]
+    posiciones = []
+    tts = [(0,"0"), (1,"n/4"), (2,"n/2"), (3, "n")]
+    ts = [(0,0), (1,4), (2,2), (3, 1)]
+    for i, t in ts:
+        for tamanio_muestra in range(0, ultimo, granularidad):
+            if tamanio_muestra == 0: tamanio_muestra = 1
+            print tamanio_muestra
+            if i == 0:
+                posiciones.append(float(tamanio_muestra))
+            tiempos = []
+            for seed in range(cantidad_muestras):
+                mediciones = 10
+                mediciones_vector = []
+                random.seed(seed)
+
+                if i == 0:
+                    generar2(tamanio_muestra, 1)
+                else:
+                    generar2(tamanio_muestra, tamanio_muestra / t)
+
+
+                for medicion in range(mediciones):
+                    mediciones_vector.append(correr_programa(binarios[problema]))
+                tiempos.append(min(mediciones_vector))
+            datos[i].append(tiempos)
+    plt.figure()
+    puntos = zip(map(float, posiciones), map(median, datos[0]))
+
+    k = encontrar_k(2, puntos)
+    print [x[1] for x in puntos]
+
+    posiciones_ints = map(int, posiciones)
+    for i in range(len(datos)):
+        plt.plot(posiciones_ints, map(lambda (n, tiempo): tiempo / n,
+            zip(posiciones_ints, map(median, datos[i]))),
+            label="Nuestro algoritmo (T = "+tts[i][1]+")")
+    #plt.plot(posiciones_ints, map(lambda n: k * 0.7 * n, posiciones),
+    #        label="{0:.4f}".format(k * 0.7)+" n", linestyle='--')
+
+    #plt.plot(posiciones_ints, map(lambda n: k * 1.3 * n, posiciones),
+    #        label="{0:.4f}".format(k * 1.3)+" n", linestyle='--')
+
+    plt.legend(loc=2)
+    plt.xlabel("Tamano de la entrada")
+    plt.ylabel("Tiempo (us) / n")
+    plt.ylim([0, 0.05])
+    plt.savefig("foo.pdf")
     plt.show()
 
 
-main()
+main2()
 os.remove(archivo)
