@@ -48,6 +48,7 @@ void backtracking(Tablero t, int s) {
             std::vector<int> derrotados;
             derrotados.push_back(i);
             derrotados.push_back(j);
+            derrotados.reserve(n);
             double x_i = puntos[i].first;
             double y_i = puntos[i].second;
             double x_j = puntos[j].first;
