@@ -47,3 +47,33 @@ Vamos a demostrar que $T(n) = F(n)$, si $n=2k$ con $k\in\mathbb{N}$, por inducci
 
   Notar que la igualdad \ref{eq:ind3-2} puede instanciarse para $i = \frac{n}{2}-1$. 
   Aplicando las igualdades \ref{eq:ind3-2} (dos veces) y \ref{eq:ind3-3} sobre la ecuación \ref{eq:ind3-1}, llegamos a que $T(n + 2) = F(n + 2)$. $\qed$
+
+
+\subsection{Kamehameha: el caso promedio se parece al peor caso}
+
+Formalicemos que queremos decir con esto. Supongamos que los puntos de nuestro \emph{input} provienen, al azar, del conjunto $\mathcal{X}_M = \{1, \cdots., M\} \times \{1, \cdots, M\}$. Lo que probaremos aquí es que si M es grande, entonces la probabilidad de que necesitemos $\frac{n}{2}$ rectas para cubrir todos los puntos (peor caso) es alta.
+
+Primero, calculemos la cantidad de formas de elegir $n$ puntos de ese conjunto:
+
+\[|\{\text{formas de elegir $n$ puntos de $\mathcal{X}_M$} \}| = \binom{M^2}{n} = \frac{M^2 (M^2 - 1) (M^2 - 2) (M^2 - 3) \dots (M^2 - n + 1)}{n!}\]
+
+Por otro lado, contemos las configuraciones en las que necesitamos menos de $\frac{n}2$ semirrectas para cubrir todos los puntos. Estas configuraciones obviamente estan incluidas (de hecho son iguales) a las configuraciones en las que hay (al menos) 3 puntos alineados.
+
+\[|\{\text{formas de elegir $n$ puntos de $\mathcal{X}_M$ tal que haya 3 alineados}\}| \leq \frac{M^2 (M^2 - 1) n (M^2 - 3) \dots (M^2 - n + 1)}{n!}\]
+
+Esta fórmula vale porque $M^2 (M^2 - 1)$ son las formas de elegir los primeros 2 puntos. Luego tengo, como máximo, $n$ puntos que puedo elegir sobre la semirrecta formada por los primeros 2 puntos. Finalmente, elijo los $n - 3$ puntos restantes como quiera. Divido por $n!$ para eliminar las permutaciones.
+
+Ahora, calculemos la probabilidad de que, dada una configuración al azar, esta requiera menos de $\frac{n}2$ semirrectas para cubrir todos los puntos. Llamaremos a esta probabilidad $p$.
+
+\[p \leq \frac{|\{\text{formas de elegir $n$ puntos de $\mathcal{X}_M$ tal que haya 3 alineados} \}|}{|\{\text{formas de elegir $n$ puntos de $\mathcal{X}_M$} \}|} \leq \frac{n} {M^2 - 2}\]
+
+
+Entonces, si tomamos los puntos sobre $\mathbb{N}^2$, como el problema indica y queremos calcular la probabilidad $p$, basta con hacer tender $M$ a $\infty$, que se ve claramente que tiende a 0.
+
+Más aún, en nuestros casos experimentales, elegimos $M = n^2$, por lo tanto queda que
+
+\[p \leq \frac{n} {n^2 - 2} \to 0\]
+
+Confirmando formalmente lo observado experimentalmente.
+
+
