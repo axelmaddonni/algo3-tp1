@@ -1,6 +1,6 @@
 \subsection{Explicación formal del problema}
 
-El ejercicio tiene una bella historia detras pero a la hora de pensar el problema resulta útil abastraernos un poco y pensarlo en terminos de objetos matemáticos. Sobre el plano tenemos un conjunto de puntos $ \{ (X_1,Y_1), (X_2,Y_2), (X_3,Y_3),..., (X_n,Y_n) \} $ todos sus elementos cumplen que $X_1 > X_2 > ... > X_n \geq 0 $ y $ 0 \leq Y_1 < Y_2 < .. < Y_n $. O sea están todos repartidos en el primer cuadrante y formando una especie de escalera decreciente de izquierda a derecha. El objetivo es cubrir a todos los puntos con la menor cantidad de rectangulos que cumplan que sus lados son paralelos a los ejes y sus extremos estan en $ (0,0) $ y $ (X_i + T, Y_i + T) $. Donde T es una número entero pasado como parametro y $(X_i,Y_i)$ son las coordenadas de algún punto del conjunto.
+El ejercicio tiene una bella historia detrás pero a la hora de pensar el problema resulta útil abstraernos un poco y pensarlo en términos de objetos matemáticos. Sobre el plano tenemos un conjunto de puntos $ \{ (X_1,Y_1), (X_2,Y_2), (X_3,Y_3),..., (X_n,Y_n) \} $ todos sus elementos cumplen que $X_1 > X_2 > ... > X_n \geq 0 $ y $ 0 \leq Y_1 < Y_2 < .. < Y_n $. O sea están todos repartidos en el primer cuadrante y formando una especie de escalera decreciente de izquierda a derecha. El objetivo es cubrir a todos los puntos con la menor cantidad de rectángulos que cumplan que sus lados son paralelos a los ejes y sus extremos están en $ (0,0) $ y $ (X_i + T, Y_i + T) $. Donde T es una número entero pasado como parámetro y $(X_i,Y_i)$ son las coordenadas de algún punto del conjunto.
 
 Esto se debe resolver en $ O(n)$ y expresar cuales puntos del conjunto se utilizan como extremos de los rectángulos.
 
@@ -45,11 +45,11 @@ Algunos ejercicios pueden tener varias soluciones posibles. En este caso tenemos
 
 \subsection{Explicación de la solución}
 
-Para resolver el ejercicio utilizamos un $algoritmo$ $goloso$. La idea es ir cubriendo todos los puntos de derecha a izquierda utilizando la menor cantidad de rectangulos posible. La técnica que utilizaremos para lograr esto, la cual veremos luego que es óptima, será por cada iteración del algoritmo buscar un rectángulo que cubra al punto mas a la derecha y al mismo tiempo cubra a la mayor cantidad posible de otros puntos, o sea en cada iteración intentará hacer lo mejor posible para ese momento en particular, por eso lo $greedy$ o $goloso$.
+Para resolver el ejercicio utilizamos un $algoritmo$ $goloso$. La idea es ir cubriendo todos los puntos de derecha a izquierda utilizando la menor cantidad de rectángulos posible. La técnica que utilizaremos para lograr esto, la cual veremos luego que es óptima, será por cada iteración del algoritmo buscar un rectángulo que cubra al punto mas a la derecha y al mismo tiempo cubra a la mayor cantidad posible de otros puntos, o sea en cada iteración intentará hacer lo mejor posible para ese momento en particular, por eso lo $greedy$ o $goloso$.
 
-Para la implementación del algoritmo tenemos como datos de entrada los puntos y el valor de $T$, utilizamos una variable $j$ la cual representa el punto mas a la derecha, al cual vamos a cubrir si o si en esa iteración y una variable $i$ la cual representa el candidato a extremo del rectángulo. Comenzamos por el punto mas a la derecha y vamos siguiendo hacia los que tienen una coordenada x menor. Como sabemos que los puntos cumplen que $X_1 > X_2 > ... > X_n \geq 0$ entonces simplemente arrancamos por $X_1$ y seguimos hasta $X_n$, esto se hace facilmente recorriendo el vector $puntos$ desde su posición $0$ hasta $n-1$. El ciclo principal se encarga de buscar en cada iteración el mejor punto para utilizar como extremo de rectángulo y termina cuando j alcanza a n, lo cual implica que ya se cubrieron todos los puntos.
+Para la implementación del algoritmo tenemos como datos de entrada los puntos y el valor de $T$, utilizamos una variable $j$ la cual representa el punto mas a la derecha, al cual vamos a cubrir si o si en esa iteración y una variable $i$ la cual representa el candidato a extremo del rectángulo. Comenzamos por el punto mas a la derecha y vamos siguiendo hacia los que tienen una coordenada x menor. Como sabemos que los puntos cumplen que $X_1 > X_2 > ... > X_n \geq 0$ entonces simplemente arrancamos por $X_1$ y seguimos hasta $X_n$, esto se hace fácilmente recorriendo el vector $puntos$ desde su posición $0$ hasta $n-1$. El ciclo principal se encarga de buscar en cada iteración el mejor punto para utilizar como extremo de rectángulo y termina cuando j alcanza a n, lo cual implica que ya se cubrieron todos los puntos.
 
-Veamos el pseudocodigo para que termine de quedar claro todo esto.
+Veamos el pseudocódigo para que termine de quedar claro todo esto. Las guardas de los dos ciclos anidados las omito y detallo mas abajo.
 
 \begin{algorithm}[H]
 \begin{algorithmic}
@@ -75,7 +75,7 @@ Veamos el pseudocodigo para que termine de quedar claro todo esto.
 
 Para lograr hacer lo dicho previamente el ciclo principal cuenta con dos bucles anidados.
 
-El primer ciclo tiene como objetivo cubrir a j y al mismo tiempo verificar si no puede cubrir algunos mas. En el pseudocódigo se puede ver facilmente como hacemos eso.
+El primer ciclo tiene como objetivo cubrir a j y al mismo tiempo verificar si no puede cubrir algunos mas. En el pseudocódigo se puede ver fácilmente como hacemos eso.
 
 \begin{algorithm}[H]
 \begin{algorithmic}
@@ -89,11 +89,11 @@ El primer ciclo tiene como objetivo cubrir a j y al mismo tiempo verificar si no
 \end{algorithmic}
 \end{algorithm}
 
-Si podemos cubrir a un punto mas al mismo tiempo que seguimos cubriendo al punto $(X_i,Y_i)$ entonces guardamos ese nuevo valor como nuestro nuevo candidato para utilizar como extremo del nuevo rectangulo. Repetimos esto hasta que ya consideramos todos los puntos o que el siguiente a nuestro candidato ya no nos permite cubrir a $(X_i,Y_i)$.
+Si podemos cubrir a un punto mas al mismo tiempo que seguimos cubriendo al punto $(X_i,Y_i)$ entonces guardamos ese nuevo valor como nuestro nuevo candidato para utilizar como extremo del nuevo rectángulo. Repetimos esto hasta que ya consideramos todos los puntos o que el siguiente a nuestro candidato ya no nos permite cubrir a $(X_i,Y_i)$.
 
 Cuando conseguimos al mejor candidato, lo almacenamos y seguimos con el Ciclo Anidado 2.
 
-El segundo ciclo tiene como tarea verificar si al haber agregado el nuevo rectangulo no se cubrieron algunos puntos mas a la izquierda.
+El segundo ciclo tiene como tarea verificar si al haber agregado el nuevo rectángulo no se cubrieron algunos puntos mas a la izquierda.
 
 \begin{algorithm}[H]
 \begin{algorithmic}
@@ -111,27 +111,25 @@ En ese caso se aumenta $j$ para que pase a representar al siguiente punto. Se re
 
 \subsubsection{Optimalidad}
 
-Para demostrar que el algoritmo porpuesto es óptimo supondre que no lo es y llegaré a un absurdo. Supongamos que tenemos un algoritmo que si resuelve el problema de manera óptima, tiene que hacer algo distinto a lo que plantea nuestro algoritmo ya que supusimos que no era óptimo. Para diferenciarse del nuestro tiene que tomar al menos una desición distinta.
+Para demostrar que el algoritmo propuesto es óptimo supondré que no lo es y llegaré a un absurdo. Supongamos que tenemos una solución que es óptima, sabemos que esta existe ya siempre podemos encontrar entre todas las finitas (no nulas) formas de cubrir todos los puntos con rectángulos la que use la menor cantidad. Sabiendo que esta solución es óptima entonces de seguro tiene que tener algo distinto a lo que devuelve nuestro algoritmo ya que supusimos que no era óptimo, tiene que tomar al menos una decisión distinta en la elección de los rectángulos.
 
-Dada la solución que suponemos es óptima, nos ponemos a ver las elecciónes de rectangulos que tomó este algoritmo de derecha a izquierda. O sea viendo primero al que tiene como extremo al punto de mayor coordenada x y siguiendo hacia los menores.
+Dada la solución que sabemos es óptima, nos ponemos a ver las elecciones de rectángulos que la componen de derecha a izquierda. O sea viendo primero al que tiene como extremo al punto de mayor coordenada x y siguiendo hacia los menores.
 
-Al ponernos a ver elecciones de rectangulos en algun momento vamos a notar que el algoritmo escogió tapar al punto que estaba cubrir mas abajo a la derecha pero sin tapar al mismo tiempo a la mayor cantidad posible de otros puntos sin cubrir. Sabemos que esto va a pasar en algun momento ya que si no fuera asi entonces sería exactamente igual a nuestro algoritmo.
+Al ponernos a ver las elecciones de rectángulos que hay en la solución óptima en algun momento vamos a notar se escoge tapar al punto que estaba mas abajo a la derecha pero sin tapar al mismo tiempo a la mayor cantidad posible de otros puntos sin cubrir. Sabemos que esto va a pasar en algun momento ya que si no fuera así entonces sería exactamente igual a la solución de nuestro algoritmo.
 
-Pero al ver esto se vuelve obvio que esa desición es peor o igual que lo que hacemos, ya que con nuestro algoritmo podriamos reemplazar esa acción por una que cubrá una mayor cantidad de puntos. Terminando en el peor de los casos usando la misma cantidad de rectangulos para la solución. Lo cual es absurdo ya que habiamos supuesto que nuestro algoritmo no era óptimo.
-
-
+Pero al ver esto se vuelve obvio que esa desición es peor o igual que lo que hacemos, ya que con nuestro algoritmo podriamos reemplazar esa acción por una que cubrá una mayor cantidad de puntos. Terminando en el peor de los casos usando la misma cantidad de rectángulos para la solución. Lo cual es absurdo ya que habiamos supuesto que nuestro algoritmo no era óptimo.
 
 \subsection{Complejidad del algoritmo}
 
-En esta sección demostraremos que el algoritmo tiene una complejidad de $\theta(n)$ donde n es la cantidad de puntos en el plano para cualquier caso (no existe peor ni mejor caso). O sea está acotado inferior y superiormente por n.
+En esta sección demostraremos que el algoritmo tiene una complejidad de $\Theta(n)$ donde n es la cantidad de puntos en el plano para cualquier caso (no existe peor ni mejor caso). O sea eventualmente, cuando n crece lo suficiente, la cantidad de instrucciones elementales queda acotada inferiormente por $k_1.n$ y superiormente por $k_2.n$ con $k_1$ y $k_2$ alguna constante real fija.
 
-Primero se crean variables lo cual cuesta a lo sumo O(n), dependiendo la estructura utilizada, por tener que averiguar la cantidad de puntos en el vector de entrada.
+Para demostrar lo dicho analicemos las partes que componen a este programa. Primero se crean variables lo cual cuesta a lo sumo $O(n)$, dependiendo la estructura utilizada, por tener que averiguar la cantidad de puntos en el vector de entrada.
 
-Lo siguiente es el ciclo principal el cual veremos que toma $\theta(n)$. Veamos una serie de proposiciones que utilizaré para demostrarlo, todas son evidentes viendo el pseudocódigo.
+Lo siguiente es el ciclo principal el cual veremos que toma $\Theta(n)$. Veamos una serie de proposiciones que utilizaré para demostrarlo, todas son evidentes viendo el pseudocódigo.
 
 \begin{enumerate}
 
-\item Los ciclos 1 y 2 cuestan O(1) por iteración.
+\item Los ciclos 1 y 2 cuestan $O(1)$ por iteración.
 
 \item La variable j aumenta una vez por cada iteracion de cada ciclo en que entra. (En cualquier de los 3 ciclos que hay).
 
@@ -170,7 +168,7 @@ Finalmente, veamos que, para instancias de igual tamaño, el tiempo que se tarda
 \begin{figure}[H]
  \centering
 	\includegraphics[width=0.8\textwidth]{img/tiempos/genkidama3.pdf}
-	\caption{\footnotesize Tiempo que toma el algoritmo en $\mu$s para una entrada de tamaño $n$. $T = n/4$. Se indican los valores del primer al tercer cuatril con un rectángulo azul y la mediana con una linea roja. El máximo y minimo se indican con lineas negras arriba y abajo del rectángulo.}
+	\caption{\footnotesize Tiempo que toma el algoritmo en $\mu$s para una entrada de tamaño $n$. $T = n/4$. Se indican los valores del primer al tercer cuartil con un rectángulo azul y la mediana con una linea roja. El máximo y minimo se indican con lineas negras arriba y abajo del rectángulo.}
 	\label{fig:genkidama-tiempos3}
 \end{figure}
 
@@ -178,8 +176,8 @@ Finalmente, veamos que, para instancias de igual tamaño, el tiempo que se tarda
 
 Para los primeros dos gráficos (es decir, para la figura \label{fig:genkidama-tiempos1} y la figura \label{fig:genkidama-tiempos2}), generamos 50 instancias al azar de para cada $n$.
 Las instancias fueron generadas de la siguiente manera: para cada $n$, elegimos $n$ puntos al azar de la grilla $\{1,..., n^2\} \times \{1, ... , n^2\}$.
-Estos puntos eran elegidos al azar usando el mismo \emph{seed} cada vez (para la instancia 1 usabamos 1 como seed, para la instancia 2, usabamos 2, etc.), de tal manera que los experimentos fueran reproducibles de una manera válida.
+Estos puntos eran elegidos al azar usando el mismo \emph{seed} cada vez (para la instancia 1 usábamos 1 como seed, para la instancia 2, usábamos 2, etc.), de tal manera que los experimentos fueran reproducibles de una manera válida.
 
 Cada instancia fue ejecutada 20 veces, y el resultado final era el mínimo de todas las corridas.
 Luego, tomabamos la mediana de todas las instancias.
-Es decir, el restultado final es la mediana de los mínimos. Como puede observarse en la figura \ref{fig:genkidama-tiempos3}, la mediana es muy representativa de lo que sucede.
+Es decir, el resultado final es la mediana de los mínimos. Como puede observarse en la figura \ref{fig:genkidama-tiempos3}, la mediana es muy representativa de lo que sucede.
