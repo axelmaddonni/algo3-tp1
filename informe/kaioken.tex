@@ -99,9 +99,17 @@ En la siguiente sección demostraremos por qué este algoritmo resuelve el probl
 
 A diferencia del resto de los problemas, en los que probaremos en conjunto correctitud y optimalidad, en este problema optamos por separar las demostraciones para hacerlas más simples para el lector.
 
-\textbf{Proposición.} El algoritmo es correcto. Además, si $n > 1$, siempre va a haber un elemento al que le asigne 1.
+\textbf{Proposición.} El algoritmo es correcto.
 
-\textbf{Observación.} Con que el algoritmo es correcto nos referimos
+\textbf{Demostración.}  Por inducción en $n$.
+
+\textit{Caso Base:} $n = 2$. El algoritmo lo resuelve en una sola pelea, donde cada guerrero pertenece a un bando distinto, $\Pi = {(1,2)}$. Nótese que se cumple lo pedido.
+
+\textit{Paso Inductivo}: Supongo que vale HI: $\forall k \in \mathbb{N}, k \leq n$, vale que el algoritmo es correcto para una entrada de tamaño $k$, con $n \geq 2$.
+
+Entonces seguimos los pasos del algoritmo, dividimos los $n$ elementos en 2 mitades, y usamos el algoritmo para resolver esas 2 mitades. Como cada mitad tiene menos elementos que $n$, entonces el algoritmo es correcto por HI, y las peleas generadas hacen que todos peleen contra todos. Ahora bien, además se agrega una pelea en la que se le asigna al primer grupo el bando 1, y al segundo grupo el bando 2.
+
+Entonces, formalmente, tomemos un par de guerreros $(g_i, g_j)$. Si estos guerreros pertenecen a la misma particion que hicimos al principio para llamar recursivamente al algoritmo, entonces seguro pelean por HI, dado que el algoritmo es correcto para instancias menores a $n$. Si pertenecen a distintas particiones, entonces la nueva pelea les asignará bandos distintos, haci\'endolos pelear. Esto completa la demostración.
 
 \subsubsection{Optimalidad}
 
@@ -111,9 +119,11 @@ Sea $p(n)$ = $"$El algoritmo D\&C propuesto resuelve el problema para $n$ guerre
 
 \textit{Caso Base:} $p(2)$. El algoritmo lo resuelve en una sola pelea, donde cada guerrero pertenece a un bando distinto, y es la mejor manera de resolverlo dado que no hay otra manera de que peleen entre sí sin generar al menos 1 pelea.
 
-\textit{Paso Inductivo}: Supongo que vale HI: $\forall k \in \mathbb{N}, k \leq n, \ vale \ p(k)$, con $n \geq 2$.
+\textit{Paso Inductivo}: Supongo que vale HI: $\forall k \in \mathbb{N}, k \leq n$, vale $p(k)$, con $n \geq 2$.
+
 Quiero ver que vale $p(n+1)$.
 Tengo $n+1$ guerreros. Para la primera pelea, tengo que dividir los guerreros en dos bandos $A$ y $B$, de modo que se generan 2 subproblemas de tamaño $|A|$ y $|B|$.
+
 Por HI, dichos subproblemas los puedo resolver óptimamente, generando $\lceil \log _2 k \rceil$ peleas, donde $k$ es la cantidad de guerreros del subproblema. Quiero ver de qué manera conviene dividir el conjunto inicial de guerreros para que la cantidad de peleas total del problema sea la mínima.
 Aplicando el algoritmo en cada bando, la $cantpeleas$ total del problema se puede calcular como: 
 \[ cantpeleas = 1 + max\{ \lceil \log _2 |A| \rceil , \lceil \log _2 |B| \rceil \}\]
@@ -121,8 +131,7 @@ Esta cantidad se minimiza tomando $|A| = |B| = \frac{n+1}{2}$, en caso de que $n
 
 Falta ver que, para $n+1$,  $cantpeleas = \lceil \log _2 (n+1) \rceil$.
 
-Si $n+1$ es par, entonces, 
-
+Si $n+1$ es par, entonces
   \begin{equation}
   \begin{aligned}
   cantpeleas =& 1 + \lceil \log _2 |A| \rceil \\
@@ -133,7 +142,7 @@ Si $n+1$ es par, entonces,
   \end{aligned}
   \end{equation}
 
-que es lo que queríamos probar.
+Que es lo que queríamos probar.
 
 Si $n+1$ no es potencia de dos, entonces puede o no ser par.
 Si $n + 1$ es impar (y no es potencia de 2), entonces existe $k > 0$ tal que $2^k < n + 1 < 2^{k+1}$.
@@ -154,7 +163,9 @@ Ahora bien, calculemos $cantpeleas$,
 Ahora bien, notemos que, como dijimos antes, $2^k < n + 1 < 2^{k+1}$. Entonces, $2^k < n + 1 < n + 2 \leq 2^{k+1}$. Por lo tanto, $k < \log_2(n + 1) < \log_2(n + 2) \leq k +1$. Por lo tanto, $\lceil \log _2 (n+1) \rceil = \lceil \log _2 (n+2) \rceil = k + 1$, por lo tanto 
 \[cantpeleas = \lceil \log _2 (n+1) \rceil\]
 
-que es lo que queríamos ver.
+Que es lo que queríamos ver.
+
+Esto completa la demostración de que el algoritmo encuentra una solución óptima.
 
 \subsection{Complejidad del algoritmo}
 
