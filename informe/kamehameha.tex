@@ -84,7 +84,7 @@ Una estrategia básica, basada en lo observado en la sección \ref{subsec:proble
 
 La diferencia entre la poda 1 y 2 puede resultar un tanto sútil pero será más clara cuando veamos la implementación de \textit{backtracking}.
 
-\subsubsection{Pseudocódigo}
+\subsubsection{Explicación del código}
   \paragraph{Variables globales:} Para tratar el problema definimos cuatro variables globales:
   \begin{itemize}
     \item \texttt{Vector(<int, int>)} $puntos$: almacena el conjunto de puntos. Dado que lo guardamos en un vector, se está imponiendo un orden sobre los puntos. Y como $puntos$ no se modifica nunca en el transcurso del programa (al menos después de inicializarlo), aprovecharemos dicho orden para referirnos a cada punto por el entero que representa su posición en $puntos$.
@@ -175,7 +175,7 @@ La diferencia entre la poda 1 y 2 puede resultar un tanto sútil pero será más
             \Else 
               \If {\footnotesize $(AlinHor?(i,j,k) \lor AlinVer?(i,j,k)) \land MismoCuadrante?(i,j,k)$}
               \Comment {\footnotesize $O(1)$}\normalsize
-                \State $derrotados.push_back(k)$
+                \State $derrotados.push\_back(k)$
                 \Comment $O(1)$
               \EndIf
             \EndIf
@@ -222,9 +222,10 @@ Decidimos omitir las constantes que suman y multiplican en el caso $n\geq 2$ pue
 
 A continuación damos una fórmula cerrada para esta ecuación de recurrecia cuando $n$ es par\footnote{Para $n$ impar puede obtenerse una fórmula muy parecida, reemplazando el $T(0)$ por $T(1)$ y cambiando $\frac{n}{2}$ por $\frac{n-1}{2}$. Para evitar sobrecargar la demostración nos limitamos al caso par pero el impar es análogo.}:
 
-\paragraph{Lema 3.1:} 
+\paragraph{Lema 3.1:} Sea $n$ par, entonces vale que
 \begin{equation}
 \begin{aligned}
+  T(n) =
   F(n) &= \sum_{i=0}^{\frac{n}{2}-1} \left((n-2i) \prod_{j=0}^{i}(n-2j)^2\right) + \left(\prod_{i=0}^{\frac{n}{2}-1}(n-2i)^2\right) T(0)\\
   &= \sum_{i=0}^{\frac{n}{2}-1} \left((n-2i) \prod_{j=0}^{i}(n-2j)^2\right) + \prod_{i=0}^{\frac{n}{2}-1}(n-2i)^2
 \end{aligned}
