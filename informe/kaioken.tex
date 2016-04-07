@@ -1,14 +1,51 @@
+
 \subsection{Explicación formal del problema}
+
+\par Para entender mejor el problema, lo especificaremos usando términos matemáticos. Se tiene un conjunto de $n$ elementos que representan a los guerreros. 
+\[G = \{g_1,...,g_n\}\]
+\par Definiremos una $pelea$ como un par de dos conjuntos disjuntos no vacíos de guerreros $A$ y $B$, donde cada uno representa el bando al que pertence en dicha pelea. En cada pelea, la unión de dichos conjuntos es el conjunto total de guerreros, es decir, todos los guerreros participan de todas las peleas:
+\[ P = (A, B)\]
+donde $A$, $B$ son conjuntos de guerreros y  \[A \ \dot{\cup}\ B = G.\]
+Notaremos $P_A$ al conjunto $A$ de guerreros que representa al primer bando en la pelea $P$, y $P_B$ al del otro bando.
+\par Dado un conjunto de peleas $Peleas = P_1,...P_k$, decimos que un guerrero $g_i$ peleó con otro (distinto) $g_j$ si $\exists P'$ pelea $\in$ $Peleas$ tal que $g_i$ $\in P'_A \ \& \ g_j \in P'_B$. 
+\par Dada una cantidad de guerreros $n$, se pide encontrar el conjunto de tamaño mínimo de peleas de modo que todos los guerreros hayan peleado entre sí. Veamos algunos ejemplos:
+
+ACA VAN A IR UNOS DIBUJITOS
+
+%\begin{figure}[htbp]
+%\centering
+%\subfigure[Solución incorrecta]{\includegraphics[width=40mm]{}}
+%\subfigure[Solución correcta]{\includegraphics[width=40mm]{}}
+%\caption{Ejemplo con n=4} \label{kaioken1}
+%\end{figure}
+%
+%\begin{figure}[htbp]
+%\centering
+%\subfigure[Solución incorrecta]{\includegraphics[width=40mm]{}}
+%\subfigure[Solución correcta]{\includegraphics[width=40mm]{}}
+%\subfigure[Solución incorrecta]{\includegraphics[width=40mm]{}}
+%\subfigure[Solución correcta]{\includegraphics[width=40mm]{}}
+%\caption{Ejemplo con n=7} \label{kaioken2}
+%\end{figure}
+
+\par Notar que puede haber más de una solución correcta. El algoritmo propuesto devuelve una de ellas.
 
 \subsection{Explicación de la solución}
 
-\subsection{Complejidad del algoritmo}
+\par Para resolver el problema, utilizamos un algoritmo usando la técnica de \textbf{divide and conquer}, es decir, dividimos el problema en subproblemas más pequeños, los resolvemos, y luego combinamos las soluciones para lograr la solución al problema total. 
+\par Para entender cómo lo aplicamos para resolver el problema, consideremos la primera pelea: $P_1$, cuando todavía no comenzaron los guerreros a pelear. Para dicha pelea, se eligen guerreros para el bando $P_{1A}$ y para el bando $P_{1B}$, de modo que luego de la pelea, todos los guerreros del bando A hubieron peleado contra los del B y viceversa. De este modo, a los guerreros del bando A, les faltará solamente pelear entre sí, al igual que los del bando B. Ahora bien, tenemos dos subproblemas separados: 
+\begin{itemize}
+\item Por un lado, necesitamos que todos los guerreros de $P_{1A}$ peleen entre sí, en la cantidad mínima de peleas posible.
+\item Por otro lado, buscaremos lo mismo para los guerreros de $P_{1B}$.
+\end{itemize}
+\par Una vez resueltos estos subproblemas, la manera de combinar las soluciones es simple. Supongamos que para la siguiente pelea, los guerreros de $P_{1A}$ se dividen en dos bandos: $C$ y $D$, y los guerreros de $P_{1B}$ se dividen en los bandos $E$ y $F$. Podemos combinar la solución en una única pelea $P_2$, tomamos $P_2$ = $(C \cup E,\ D \cup F)$, de modo que en una misma pelea se logren enfrentar los guerreros de $C$ y $D$, y de $E$ y $F$. De la misma forma procedemos para las siguientes peleas.
+\par Podría pasar que cuando aplicamos el algoritmo para resolver los dos subproblemas, nos den distinta cantidad de peleas necesarias para resolver uno y otro. En ese caso, necesitaremos como mínimo, el máximo entre las dos. Los guerreros que ya pelearon contra todos sus contrincantes para dichas peleas, se asignarán a cualquier bando ya que es indistinto.
+\par Repetimos el mecanismo hasta llegar al caso base, correspondiente a cuando queremos hacer que 2 guerreros peleen en la mínima cantidad de peleas necesarias. En  este caso sólo se necesita 1 pelea, un guerrero para cada cada bando. En caso de que la cantidad de guerreros de un conjunto sea impar, llegaremos al caso $n=1$. Este caso proviene de dividir previamente un conjunto de 3 guerreros $g_1, g_2, g_3$ en los bandos $g_1$ y  $g_2, g_3$ respectivamente, de modo que el guerrero que queda solo ($g_1$) ya peleó contra los otros dos, y hubo completado todas las peleas contra los demás guerreros, así que el caso $n$ = 1 está resuelto.
+\par Para dividir en subproblemas, el algoritmo presentado divide al conjunto inicial de guerreros a la mitad, es decir, los subconjuntos generados para cada bando son:
+\[A = \{g_1,...,g_{\frac{n}{2}}\}\] 
+\[B = \{g_{\frac{n}{2}+1},...,g_n\}\]
+y luego aplicamos recursión para aplicar el algoritmo a cada bando. Veamos el pseudocódigo:
 
-El análisis de complejidad es simple, es un algoritmo de Divide \& Conquer clásico, que divide siempre el trabajo en 2 y luego fusiona los resultados de los subproblemas en tiempo $O(n)$. Haciendo una analogía, por ejemplo, con el algoritmo de MergeSort, se puede predecir fácilmente que la complejidad será de $O(nlogn)$.
-
-\subsubsection{Esbozo del algoritmo}
-
-El algoritmo fue analizado en profundidad anteriormente. A grandes rasgos, puede describirse de la siguiente manera:
 \begin{algorithm}
 \begin{algorithmic}
 \caption{Esbozo del algoritmo de KaioKen}
@@ -34,7 +71,61 @@ El algoritmo fue analizado en profundidad anteriormente. A grandes rasgos, puede
 \end{algorithmic}
 \end{algorithm}
 
-Como puede verse claramente, tenemos dos casos base que toman tiempo constante en ser resueltos.
+Los resultados obtenidos se van guardando en una matriz (utilizando índices pasados por parámetro para saber qué lugar corresponde a cada guerrero), de forma que una vez calculadas todas las peleas, se imprima la matriz que indica el bando (1 o 2) de cada uno en cada una de las peleas. Esta matriz tiene un tamaño fijo de $n$ columnas y $cantpeleas$ filas, donde 
+\[ cantpeleas = \lceil \log _2 n \rceil. \]
+ es decir, hay una fórmula cerrada para saber la cantidad de peleas que genera nuestro algoritmo, y proviene de dividir en cada paso el $n$ en mitades iguales. Es decir, por ejemplo:
+\begin{itemize}
+\item Para $n = 4$, $cantpeleas$ = 2.
+\item Para $n = 5,...,8$, $cantpeleas$ = 3.
+\item Para $n = 9$, $cantpeleas$ = 4.
+\item etc...
+\end{itemize}
+En la siguiente sección demostraremos por qué este algoritmo resuelve el problema de manera óptima.
+
+\subsection{Optimalidad}
+
+\par Demostraremos que el algoritmo propuesto para resolver el problema es correcto y óptimo, es decir, devuelve un conjunto de peleas de tamaño mínimo para que todos los guerreros hayan peleado entre sí. Usaremos \textbf{índucción global en n}:
+
+\par Sea $p(n)$ = $"$El algoritmo D\&C propuesto resuelve el problema para $n$ guerreros de manera óptima, generando $\lceil \log _2 n \rceil$ peleas$"$. 
+
+\par \textit{Caso Base:} $p(2)$. El algoritmo lo resuelve en una sola pelea, donde cada guerrero pertenece a un bando distinto, y es la mejor manera de resolverlo dado que no hay otra manera de que peleen entre sí sin generar al menos 1 pelea.
+
+\par \textit{Paso Inductivo}: Supongo que vale HI: $\forall k \in \mathbb{N}, k \leq n, \ vale \ p(k)$, con $n \geq 2$.
+\par Quiero ver que vale $p(n+1)$.
+\par Tengo $n+1$ guerreros. Para la primera pelea, tengo que dividir los guerreros en dos bandos $A$ y $B$, de modo que se generan 2 subproblemas de tamaño $|A|$ y $|B|$.
+Por HI, dichos subproblemas los puedo resolver óptimamente, generando $\lceil \log _2 k \rceil$ peleas, donde $k$ es la cantidad de guerreros del subproblema. Quiero ver de qué manera conviene dividir el conjunto inicial de guerreros para que la cantidad de peleas total del problema sea la mínima.
+\par Aplicando el algoritmo en cada bando, la $cantpeleas$ total del problema se puede calcular como: 
+\[ cantpeleas = 1 + max\{ \lceil \log _2 |A| \rceil , \lceil \log _2 |B| \rceil \}\]
+\par Esta cantidad se minimiza tomando $|A| = |B| = \frac{n+1}{2}$, en caso de que $n+1$ sea par, o $|A| = \frac{n+1}{2}$ y $|B| = \frac{n+1}{2} + 1$ en caso de que sea impar. Entonces, demostramos que aplicando el algoritmo de D\&C para $n+1$ también llegamos a una solución óptima.
+
+\par Falta ver que, para $n+1$,  $cantpeleas = \lceil \log _2 (n+1) \rceil$.
+
+\par Si $n+1$ es potencia de dos (por lo tanto es par), entonces, spg, 
+
+  \begin{equation}
+  \begin{aligned}
+  cantpeleas =& 1 + \lceil \log _2 |A| \rceil \\
+  cantpeleas =& 1 + \lceil \log _2 \frac{n+1}{2} \rceil \\
+  cantpeleas =& 1 + \lceil \log _2 (n+1) \rceil  - 1 \\
+  cantpeleas =& \lceil \log _2 (n+1) \rceil \\
+  \end{aligned}
+  \end{equation}
+
+que es lo que queríamos probar.
+
+\par Si $n+1$ no es potencia de dos, entonces puede o no ser par.
+
+FALTA DEMOSTRAR ESTA PARTE (bardo)
+
+\subsection{Complejidad del algoritmo}
+
+El análisis de complejidad es simple, es un algoritmo de Divide \& Conquer clásico, que divide siempre el trabajo en 2 y luego fusiona los resultados de los subproblemas en tiempo $O(n)$. Haciendo una analogía, por ejemplo, con el algoritmo de MergeSort, se puede predecir fácilmente que la complejidad será de $O(nlogn)$.
+
+\subsubsection{Esbozo del algoritmo}
+
+El algoritmo fue analizado en profundidad anteriormente. 
+
+Como puede verse en el pseudocódigo, tenemos dos casos base que toman tiempo constante en ser resueltos.
 
 Por otro lado, el tercer caso realiza un trabajo de costo lineal, escribiendo $n$ entradas de la matriz, y luego hace 2 llamadas recursivas, dividiendo el trabajo en 2 mitades iguales (en caso de que $n$ sea impar, la segunda mitad va a tener un elemento más).
 
