@@ -10,27 +10,53 @@ donde $A$, $B$ son conjuntos de elementos y  \[A \ \dot{\cup}\ B = G.\]
 
 Notaremos $P_A$ al conjunto $A$ de elementos que representa al primer elemento de la partición $P$, y $P_B$ al del otro. Además, para todo elemento $g_k$, notaremos $B_P(g_k)$ (bando, en los t\'erminos del enunciado) al conjunto de la particion $P$ al que $g_k$ pertenece. O sea que los valores que puede tomar $B_P(g_k)$ son $P_A$ o $P_B$. 
 
-Dada una cantidad de elementos $n$, se pide encontrar el conjunto de tamaño mínimo de particiones de modo que para todo par de elementos $(g_i, g_j)$, exista particion $P$ tal que $B_P(g_i) \neq B_P(g_j)$.
+Dada una cantidad de elementos $n$, se pide encontrar el conjunto de tamaño mínimo de particiones de modo que para todo par de elementos $(g_i, g_j)$, exista partición $P$ tal que $B_P(g_i) \neq B_P(g_j)$. Veamos algunos ejemplos gráficamente, donde cada cuadrado representa un guerrero, y su color el bando al que pertenece en cada partición:
 
-ACA VAN A IR UNOS DIBUJITOS
-
-%\begin{figure}[htbp]
-%\centering
-%\subfigure[Solución incorrecta]{\includegraphics[width=40mm]{}}
-%\subfigure[Solución correcta]{\includegraphics[width=40mm]{}}
-%\caption{Ejemplo con n=4} \label{kaioken1}
-%\end{figure}
-%
-%\begin{figure}[htbp]
-%\centering
-%\subfigure[Solución incorrecta]{\includegraphics[width=40mm]{}}
-%\subfigure[Solución correcta]{\includegraphics[width=40mm]{}}
-%\subfigure[Solución incorrecta]{\includegraphics[width=40mm]{}}
-%\subfigure[Solución correcta]{\includegraphics[width=40mm]{}}
-%\caption{Ejemplo con n=7} \label{kaioken2}
-%\end{figure}
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.25\textwidth}
+  \centering
+    \includegraphics[width=1\textwidth]{img/ejemplos/ej1-1.png}
+  \caption*{\footnotesize Posible solución correcta con 3 particiones.}
+  \label{fig:ej1-1}
+\end{minipage}%
+\hspace{0.05\textwidth}
+\begin{minipage}{0.25\textwidth}   
+  \centering
+    \includegraphics[width=1\textwidth]{img/ejemplos/ej1-2.png} 
+  \caption*{\footnotesize Posible solución correcta con 3 particiones.}
+  \label{fig:ej1-2}
+\end{minipage}%
+\hspace{0.05\textwidth}
+\begin{minipage}{0.25\textwidth}   
+  \centering
+    \includegraphics[width=1\textwidth]{img/ejemplos/ej1-3.png} 
+  \caption*{\footnotesize Solución incorrecta con 4 particiones.}
+  \label{fig:ej1-3}
+\end{minipage}%
+\caption{Ejemplo con n=5}
+\end{figure}
 
 Notar que puede haber más de una solución correcta. El algoritmo propuesto devuelve una de ellas.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.25\textwidth}
+  \centering
+    \includegraphics[width=1\textwidth]{img/ejemplos/ej1-4.png}
+  \caption*{\footnotesize Posible solución correcta con 3 particiones.}
+  \label{fig:ej1-4}
+\end{minipage}%
+\hspace{0.1\textwidth}
+\begin{minipage}{0.25\textwidth}   
+  \centering
+    \includegraphics[width=1\textwidth]{img/ejemplos/ej1-5.png} 
+  \caption*{\footnotesize Solución incorrecta con 4 particiones.}
+  \label{fig:ej1-5}
+\end{minipage}%
+\caption{Ejemplo con n=7}
+\label{fign7}
+\end{figure}
 
 \subsection{Explicación de la solución}
 
@@ -48,7 +74,7 @@ Ahora bien, tenemos dos subproblemas separados:
 \item Por otro lado, buscaremos lo mismo para los guerreros de $P_{1B}$.
 \end{itemize}
 
-Una vez resueltos estos subproblemas, la manera de combinar las soluciones es simple. Supongamos que para la siguiente pelea, los guerreros de $P_{1A}$ se dividen en dos bandos: $C$ y $D$, y los guerreros de $P_{1B}$ se dividen en los bandos $E$ y $F$. Podemos combinar la solución en una única pelea $P_2$, tomamos $P_2$ = $(C \cup E,\ D \cup F)$, de modo que en una misma pelea se logren enfrentar los guerreros de $C$ y $D$, y de $E$ y $F$. De la misma forma procedemos para las siguientes peleas.
+Una vez resueltos estos subproblemas, la manera de combinar las soluciones es simple. Supongamos que para la siguiente pelea, los guerreros de $P_{1A}$ se dividen en dos bandos: $C$ y $D$, y los guerreros de $P_{1B}$ se dividen en los bandos $E$ y $F$. Podemos combinar la solución en una única pelea $P_2$, tomando $P_2$ = $(C \cup E,\ D \cup F)$, de modo que en una misma pelea se logren enfrentar los guerreros de $C$ y $D$, y de $E$ y $F$. De la misma forma procedemos para las siguientes peleas.
 
 Podría pasar que cuando aplicamos el algoritmo para resolver los dos subproblemas, ambas subsoluciones resulten con distinta cantidad de peleas necesarias para resolver uno y otro. En ese caso necesitaremos como mínimo el máximo entre las dos. Los guerreros que ya pelearon contra todos sus contrincantes para dichas peleas, se asignarán a cualquier bando ya que es indistinto.
 
@@ -57,7 +83,21 @@ Repetimos el mecanismo hasta llegar al caso base, correspondiente a cuando quere
 Para dividir en subproblemas, el algoritmo presentado divide al conjunto inicial de guerreros a la mitad, es decir, los subconjuntos generados para cada bando son:
 \[A = \{g_1,...,g_{\frac{n}{2}}\}\] 
 \[B = \{g_{\frac{n}{2}+1},...,g_n\}\]
-y luego aplicamos recursión para aplicar el algoritmo a cada bando. Veamos el pseudocódigo:
+y luego aplicamos recursión para aplicar el algoritmo a cada bando. Gráficamente:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.50\textwidth]{img/ejemplos/ej1-6.png}
+\label{fig:ej1-6}
+\caption{Gráfico ilustrativo del algoritmo D\&C propuesto}
+\end{figure}
+
+Notar que en caso de que $n$ no sea una potencia de 2, en la última partición aparecerán guerreros que pueden tomar cualquier bando debido a que para ese momento ya pelearon contra todos los demás. Por ejemplo, en la solución al ejemplo con $n=7$ de la figura \ref{fign7} (obtenida por el algoritmo presentado), se encuentra resaltado en la última partición un guerrero al que se le puede asignar cualquier bando.
+
+\subsubsection{Pseudocódigo}
+Veamos el pseudocódigo:
+
+\newpage
 
 \begin{algorithm}
 \begin{algorithmic}
@@ -144,8 +184,7 @@ Si $n+1$ es par, entonces
 
 Que es lo que queríamos probar.
 
-Si $n+1$ no es potencia de dos, entonces puede o no ser par.
-Si $n + 1$ es impar (y no es potencia de 2), entonces existe $k > 0$ tal que $2^k < n + 1 < 2^{k+1}$.
+Si $n + 1$ es impar (y por lo tanto, no es potencia de 2), entonces existe $k > 0$ tal que $2^k < n + 1 < 2^{k+1}$.
 Además, podemos tomar
   $A = \lceil \frac{n+1}{2} \rceil = \frac{n+2}{2}$ y
   $B = \lfloor \frac{n+1}2 \rfloor = \frac{n}2$.
@@ -173,23 +212,21 @@ El análisis de complejidad es simple, es un algoritmo de Divide \& Conquer clá
 
 \subsubsection{Esbozo del algoritmo}
 
-El algoritmo fue analizado en profundidad anteriormente. 
-
 Como puede verse en el pseudocódigo, tenemos dos casos base que toman tiempo constante en ser resueltos.
 
 Por otro lado, el tercer caso realiza un trabajo de costo lineal, escribiendo $n$ entradas de la matriz, y luego hace 2 llamadas recursivas, dividiendo el trabajo en 2 mitades iguales (en caso de que $n$ sea impar, la segunda mitad va a tener un elemento más).
 
 \subsubsection{Análisis temporal}
-Si quisieramos expresar la cantidad de operaciones que realiza el algoritmo para un input de tamaño $n$, podriamos escribirlo fácilmente de la siguiente manera:
+Si quisieramos expresar la cantidad de operaciones que realiza el algoritmo para un input de tamaño $n$, podríamos escribirlo de la siguiente manera:
 \[T(1) = 1\]
 \[T(2) = 2\]
 \[T(n) = n + 2 T \left(\frac{n}{2}\right)\]
 
-Ahora podemos usar el teorema maestro. El teorema maestro se referia a relaciones de recurrencia de la pinta:
+Ahora podemos usar el teorema maestro. El teorema maestro se refiere a relaciones de recurrencia de la pinta:
 
 \[T(n) = f(n) + a T\left(\frac{n}{b}\right)\]
 
-Y afirmaba, entre otras cosas, que si $f(n) \in O(n^c \log^k n)$ donde $c = \log_b a$, entonces $T(n) \in \Theta(n^c \log^{k+1} n)$. En este caso, se ve claramente que $f(n) = n \in O(n^1 \log^0 n)$, y además $1 = \log_2 2$, por lo que el teorema maestro se puede aplicar, y nos dice que
+Y afirma, entre otras cosas, que si $f(n) \in O(n^c \log^k n)$ donde $c = \log_b a$, entonces $T(n) \in \Theta(n^c \log^{k+1} n)$. En este caso, se ve claramente que $f(n) = n \in O(n^1 \log^0 n)$, y además $1 = \log_2 2$, por lo que el teorema maestro se puede aplicar, y nos dice que
 
 \[T(n) \in \Theta(n \log n)\]
 
@@ -235,6 +272,6 @@ Con la figura \ref{fig:kaioken-tiempos2} se confirma lo que dijimos anteriorment
 
 \subsubsection{M\'etodo de experimentación}
 
-Para este problema es fue muy fácil generar casos de prueba, dado que el único input para el programa es $n$, por lo que simplemente corrimos el programa con diferentes $n$ de entrada. Ejecutamos el programa 50 veces para cada $n$ y el resultado que graficamos fue el mínimo de todas las ejecuciones (para cada $n$). Elegimos el mínimo porque es el que nos permite eliminar outliers que tienen que ver con context switches o con factores de la ejecucion sobre los que no tenemos control.
+Para este problema fue muy fácil generar casos de prueba, dado que el único input para el programa es $n$, por lo que simplemente corrimos el programa con diferentes $n$ de entrada. Ejecutamos el programa 50 veces para cada $n$ y el resultado que graficamos fue el mínimo de todas las ejecuciones (para cada $n$). Elegimos el mínimo porque es el que nos permite eliminar outliers que tienen que ver con context switches o con factores de la ejecución sobre los que no tenemos control.
 
 
