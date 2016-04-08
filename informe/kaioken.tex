@@ -8,7 +8,7 @@ Definiremos una \emph{partición} (\emph{pelea} en el enunciado) como un par de 
 \[ P = (A, B)\]
 donde $A$, $B$ son conjuntos de elementos y  \[A \ \dot{\cup}\ B = G.\]
 
-Notaremos $P_A$ al conjunto $A$ de elementos que representa al primer elemento de la partición $P$, y $P_B$ al del otro. Además, para todo elemento $g_k$, notaremos $B_P(g_k)$ (bando, en los t\'erminos del enunciado) al conjunto de la particion $P$ al que $g_k$ pertenece. O sea que los valores que puede tomar $B_P(g_k)$ son $P_A$ o $P_B$. 
+Notaremos $P_A$ al conjunto $A$ de elementos que representa al primer elemento de la partición $P$, y $P_B$ al del otro. Además, para todo elemento $g_k$, notaremos $B_P(g_k)$ (bando, en los t\'erminos del enunciado) al conjunto de la partición $P$ al que $g_k$ pertenece. O sea que los valores que puede tomar $B_P(g_k)$ son $P_A$ o $P_B$. 
 
 Dada una cantidad de elementos $n$, se pide encontrar el conjunto de tamaño mínimo de particiones de modo que para todo par de elementos $(g_i, g_j)$, exista partición $P$ tal que $B_P(g_i) \neq B_P(g_j)$. Veamos algunos ejemplos gráficamente, donde cada cuadrado representa un guerrero, y su color el bando al que pertenece en cada partición:
 
@@ -149,7 +149,7 @@ A diferencia del resto de los problemas, en los que probaremos en conjunto corre
 
 Entonces seguimos los pasos del algoritmo, dividimos los $n$ elementos en 2 mitades, y usamos el algoritmo para resolver esas 2 mitades. Como cada mitad tiene menos elementos que $n$, entonces el algoritmo es correcto por HI, y las peleas generadas hacen que todos peleen contra todos. Ahora bien, además se agrega una pelea en la que se le asigna al primer grupo el bando 1, y al segundo grupo el bando 2.
 
-Entonces, formalmente, tomemos un par de guerreros $(g_i, g_j)$. Si estos guerreros pertenecen a la misma particion que hicimos al principio para llamar recursivamente al algoritmo, entonces seguro pelean por HI, dado que el algoritmo es correcto para instancias menores a $n$. Si pertenecen a distintas particiones, entonces la nueva pelea les asignará bandos distintos, haci\'endolos pelear. Esto completa la demostración.
+Entonces, formalmente, tomemos un par de guerreros $(g_i, g_j)$. Si estos guerreros pertenecen a la misma partición que hicimos al principio para llamar recursivamente al algoritmo, entonces seguro pelean por HI, dado que el algoritmo es correcto para instancias menores a $n$. Si pertenecen a distintas particiones, entonces la nueva pelea les asignará bandos distintos, haci\'endolos pelear. Esto completa la demostración.
 
 \subsubsection{Optimalidad}
 
@@ -245,7 +245,7 @@ Primero veamos que, en la práctica, la complejidad del algoritmo es efectivamen
 	\label{fig:kaioken-tiempos3}
 \end{figure}
 
-Se ve claramente en la figura \ref{fig:kaioken-tiempos3} que el tiempo que toma el algoritmo esta acotado por arriba y por debajo por $k n \log n$ para algun $k$, es decir, el algoritmo es $\Theta(n \log n)$.
+Se ve claramente en la figura \ref{fig:kaioken-tiempos3} que el tiempo que toma el algoritmo esta acotado por arriba y por debajo por $k n \log n$ para algún $k$, es decir, el algoritmo es $\Theta(n \log n)$.
 
 Para hacer un análisis más fino e interesante, es necesario hacer un \emph{close-up} y ver las complejidades de mas cerca.
 
@@ -256,7 +256,10 @@ Para hacer un análisis más fino e interesante, es necesario hacer un \emph{clo
 	\label{fig:kaioken-tiempos1}
 \end{figure}
 
-Como puede verse en la figura \ref{fig:kaioken-tiempos1}, el algoritmo claramente es $\Theta(n \log n)$, pero también puede observarse que hay \emph{saltos} de tiempo en algunos lugares. Se puede inferir fácilmente que estos saltos suceden en las entradas donde $n = 2^k + 1$ para algun $k$, es decir, cuando $n$ es una potencia de 2 más 1. Esto se debe a que, como fue explicado antes, la cantidad de peleas necesarias es $\lceil \log_2(n) \rceil$, entonces para todos los numeros entre dos potencias de 2, la cantidad de peleas requerida es la misma, pero luego de una potencia de 2 esta cantidad de peleas aumenta en 1. A esto se debe los saltos luego de las potencias de 2.
+Como puede verse en la figura \ref{fig:kaioken-tiempos1}, el algoritmo claramente es $\Theta(n \log n)$, pero también puede observarse que hay \emph{saltos} de tiempo en algunos lugares.
+Se puede inferir fácilmente que estos saltos suceden en las entradas donde $n = 2^k + 1$ para algún $k$, es decir, cuando $n$ es una potencia de 2 más 1.
+Esto se debe a que, como fue explicado antes, la cantidad de peleas necesarias es $\lceil \log_2(n) \rceil$, entonces para todos los números entre dos potencias de 2, la cantidad de peleas requerida es la misma, pero luego de una potencia de 2 esta cantidad de peleas aumenta en 1.
+A esto se debe los saltos luego de las potencias de 2.
 
 Para visualizar más claramente este hecho, realizamos el siguiente gráfico, en el que están marcadas las potencias de 2.
 
@@ -267,7 +270,7 @@ Para visualizar más claramente este hecho, realizamos el siguiente gráfico, en
 	\label{fig:kaioken-tiempos2}
 \end{figure}
 
-Con la figura \ref{fig:kaioken-tiempos2} se confirma lo que dijimos anteriormente. Luego de cada potencia de 2, el tiempo aumenta, y luego baja lentamente, dado que la relacion tiempo - $n \log n$ se mantiene constante, pero $n$ aumenta, con lo cual la división se achica.
+Con la figura \ref{fig:kaioken-tiempos2} se confirma lo que dijimos anteriormente. Luego de cada potencia de 2, el tiempo aumenta, y luego baja lentamente, dado que la relación tiempo - $n \log n$ se mantiene constante, pero $n$ aumenta, con lo cual la división se achica.
 
 
 \subsubsection{M\'etodo de experimentación}
