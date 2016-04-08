@@ -10,11 +10,14 @@ using namespace std;
 void generarpeleas(int n, int pactual, int inicio,
                    vector<vector<int>> &matrizpeleas){
   if (n == 1) {
+    // El caso n = 1 es trivial.
     matrizpeleas[pactual][inicio] = 1;
   } else if (n == 2) {
+    // El caso n = 2 es trivial.
     matrizpeleas[pactual][inicio] = 1;
     matrizpeleas[pactual][inicio+1] = 2;
   } else {
+    // Nos aseguramos de que las dos partes peleen entre si.
     for (int j=0; j< n; j++) {
       if (j < n/2) {
         matrizpeleas[pactual][inicio + j] = 1;
@@ -22,6 +25,7 @@ void generarpeleas(int n, int pactual, int inicio,
         matrizpeleas[pactual][inicio + j] = 2;
       }
     }
+    // Resolvemos el subproblema para cada mitad.
     generarpeleas(n / 2, pactual+1, inicio, matrizpeleas);
     generarpeleas((n + 1) / 2, pactual+1, n/2 + inicio, matrizpeleas);
   }
@@ -32,7 +36,8 @@ void kaioken (int n){
   cout << cpeleas << endl;
 
   if (n == 1) {
-    cout << 1 << endl;
+    // Si hay 1 solo guerrero, el problema ya esta resuelto.
+    return;
   } else if (n == 2) {
     cout << 1 << " " << 2 << endl;
   } else {
@@ -64,7 +69,6 @@ void kaioken (int n){
 int main() {
   int k;
   std::cin >> k;
-
 
   std::chrono::time_point<std::chrono::system_clock> start, end;
   start = std::chrono::system_clock::now();

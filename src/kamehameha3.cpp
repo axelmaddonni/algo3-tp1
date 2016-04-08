@@ -11,6 +11,9 @@ vector<vector<int>> mejor_sol;
 std::vector<pair<int, int>> puntos;
 int n;
 
+
+// Esta funcion se va a utilizar para saber a que semirrecta de una recta un
+// punto pertenece.
 bool mismo_cuadrante(pair<int, int> pi, pair<int, int> pj, pair<int, int> pk) {
   int x_i = pi.first;
   int y_i = pi.second;
@@ -19,6 +22,7 @@ bool mismo_cuadrante(pair<int, int> pi, pair<int, int> pj, pair<int, int> pk) {
   int x_k = pk.first;
   int y_k = pk.second;
 
+  // Comparamos los puntos para saber de que lado esta el punto.
   if((x_j >= x_i && x_k >= x_i) || (x_j <= x_i && x_k <= x_i)){
     if((y_j >= y_i && y_k >= y_i) || (y_j <= y_i && y_k <= y_i)){
       return true;
@@ -28,11 +32,13 @@ bool mismo_cuadrante(pair<int, int> pi, pair<int, int> pj, pair<int, int> pk) {
 }
 
 void backtracking(Tablero t, int s) {
-  if(s >= mejor) return;  // El subarbol no es aceptable
-  if(t.Solucionado()) {
+  if(s >= mejor)
+    return;  // El subarbol no es aceptable.
+  else if(t.Solucionado()) {
     mejor = s;
     mejor_sol = t.Solucion();
   } else {
+    // Elegimos un vivo.
     for (int i = 0; i < n; i++) {
       if (t.EstaVivo(i)) {
         if (t.Vivos() == 1) {
@@ -42,6 +48,7 @@ void backtracking(Tablero t, int s) {
           backtracking(t, s+1);
           break;
         }
+        // Elegimos otro vivo.
         for (int j = 0; j < n; j++) {
           if(j != i && t.EstaVivo(j)){
             Tablero sucesor(t);
@@ -53,6 +60,7 @@ void backtracking(Tablero t, int s) {
             double y_i = puntos[i].second;
             double x_j = puntos[j].first;
             double y_j = puntos[j].second;
+            // Eliminamos todos los elementos que pertenecen a esa semirrecta.
             for (int k = 0; k < n; k++) {
               if(k != i && k != j && t.EstaVivo(k)) {
                 double x_k = puntos[k].first;
@@ -72,8 +80,14 @@ void backtracking(Tablero t, int s) {
                 }
               }
             }
+            // Eliminamos de la lista a los elementos cubiertos por la semirrecta,
+            // y llamamos a la función recursivamente para cubrir al resto de los
+            // puntos.
             sucesor.Matar(derrotados);
             backtracking(sucesor, s+1);
+            // Si el mejor = s+1 no vale la pena seguir iterando, porque cualquier
+            // solución que encontremos va a ser a lo sumo tan buena como la que
+            // tenemos.
             if (mejor == s+1) return;
           }
         }
@@ -85,7 +99,7 @@ void backtracking(Tablero t, int s) {
 vector<vector<int> > solve(vector<pair<int, int> > ptos) {
   puntos = ptos;
   Tablero inicial(n);
-  mejor = puntos.size();
+  mejor = puntos.size() + 1;
   backtracking(inicial, 0);
 
   return mejor_sol;

@@ -11,6 +11,7 @@ std::vector<int> solve(std::vector<std::pair<int, int>> puntos, int t) {
   std::vector<int> res;
   while (j < n) {
     i = j;		
+    // Elijo al ultimo el elemento que sirve para abarcar todos hasta el primero.
     while (i < n - 1 &&
            puntos[i+1].first + t >= puntos[j].first) {
       i++;
@@ -18,6 +19,7 @@ std::vector<int> solve(std::vector<std::pair<int, int>> puntos, int t) {
     res.push_back(i + 1);
     i++;
     j = i;
+    // Avanzo todos los elementos que abarcamos.
     while (j < n  && puntos[j].second <= puntos[i-1].second + t) {
       j++;
     }
