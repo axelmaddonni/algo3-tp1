@@ -76,4 +76,165 @@ Más aún, en nuestros casos experimentales, elegimos $M = n^2$, por lo tanto qu
 
 Confirmando formalmente lo observado experimentalmente.
 
+\newpage
+\subsection{Partes relevantes del código}
+\lstset{language=C++, breaklines=true, basicstyle=\footnotesize}
+\lstset{numbers=left, numberstyle=\tiny, stepnumber=1, numbersep=5pt, tabsize=2}
 
+\subsubsection{kaioken1.cpp}
+\begin{lstlisting}[frame=single]
+void generarpeleas(int n, int pactual, int inicio,
+                   vector<vector<int>> &matrizpeleas){
+  if (n == 1) {
+    // El caso n = 1 es trivial.
+    matrizpeleas[pactual][inicio] = 1;
+  } else if (n == 2) {
+    // El caso n = 2 es trivial.
+    matrizpeleas[pactual][inicio] = 1;
+    matrizpeleas[pactual][inicio+1] = 2;
+  } else {
+    // Nos aseguramos de que las dos partes peleen entre si.
+    for (int j=0; j< n; j++) {
+      if (j < n/2) {
+        matrizpeleas[pactual][inicio + j] = 1;
+      } else {
+        matrizpeleas[pactual][inicio + j] = 2;
+      }
+    }
+    // Resolvemos el subproblema para cada mitad.
+    generarpeleas(n / 2, pactual+1, inicio, matrizpeleas);
+    generarpeleas((n + 1) / 2, pactual+1, n/2 + inicio, matrizpeleas);
+  }
+}
+
+void kaioken (int n){
+  int cpeleas = ceil(log2(n));
+  cout << cpeleas << endl;
+
+  if (n == 1) {
+    // Si hay 1 solo guerrero, el problema ya esta resuelto.
+    return;
+  } else if (n == 2) {
+    cout << 1 << " " << 2 << endl;
+  } else {
+    vector<vector<int>> matrizpeleas(cpeleas, vector<int>(n,1));
+    int pactual = 0;
+    for (int i = 0; i < n; i++) {
+      if (i < n/2) {
+        matrizpeleas[pactual][i] = 1;
+      } else {
+        matrizpeleas[pactual][i] = 2;
+      }
+    }
+
+    generarpeleas(n / 2, pactual+1, 0, matrizpeleas);
+    generarpeleas((n + 1) / 2, pactual+1, n/2, matrizpeleas);
+
+    // Imprimo la matriz
+    for (int i = 0; i < cpeleas; i++) {
+      for (int j = 0; j < n; j++) {
+        cout << matrizpeleas[i][j];
+        if (j != n-1) cout << " ";
+      }
+      cout << endl;
+    }
+  }
+} 
+\end{lstlisting}
+
+\subsubsection{genkidama2.cpp}
+
+\begin{lstlisting}[frame=single]
+vector<int> solve(vector<pair<int, int>> puntos, int t) {
+  int n = puntos.size();
+  int i = 0;  // a quien le disparo
+  int j = 0;  // primero a matar
+  vector<int> res;
+  while (j < n) {
+    i = j;    
+    // Elijo al ultimo el elemento que sirve para abarcar todos hasta el primero.
+    while (i < n - 1 &&
+           puntos[i+1].first + t >= puntos[j].first) {
+      i++;
+    }
+    res.push_back(i + 1);
+    i++;
+    j = i;
+    // Avanzo todos los elementos que abarcamos.
+    while (j < n  && puntos[j].second <= puntos[i-1].second + t) {
+      j++;
+    }
+  }
+  return res;
+}
+\end{lstlisting}
+
+\subsubsection{kamehameha3.cpp}
+
+\begin{lstlisting}[frame=single]
+int mejor;
+vector<vector<int>> mejor_sol;
+std::vector<pair<int, int>> puntos;
+int n;
+
+void backtracking(Tablero t, int s) {
+  if(s >= mejor)
+    return;  // El subarbol no es aceptable.
+  else if(t.Solucionado()) {
+    mejor = s;
+    mejor_sol = t.Solucion();
+  } else {
+    // Elegimos un vivo.
+    for (int i = 0; i < n; i++) {
+      if (t.EstaVivo(i)) {
+        if (t.Vivos() == 1) {
+          vector<int> derrotados;
+          derrotados.push_back(i);
+          t.Matar(derrotados);
+          backtracking(t, s+1);
+          break;
+        }
+        // Elegimos otro vivo.
+        for (int j = 0; j < n; j++) {
+          if(j != i && t.EstaVivo(j)){
+            Tablero sucesor(t);
+            std::vector<int> derrotados;
+            derrotados.push_back(i);
+            derrotados.push_back(j);
+            derrotados.reserve(n);
+            double x_i = puntos[i].first;
+            double y_i = puntos[i].second;
+            double x_j = puntos[j].first;
+            double y_j = puntos[j].second;
+            // Eliminamos todos los elementos que pertenecen a esa semirrecta.
+            for (int k = 0; k < n; k++) {
+              if(k != i && k != j && t.EstaVivo(k)) {
+                double x_k = puntos[k].first;
+                double y_k = puntos[k].second;
+                if (x_i != x_j && y_i != y_j) {
+                  double cociente_x = (x_k - x_i) / (x_j - x_i); 
+                  double cociente_y = (y_k - y_i) / (y_j - y_i); 
+                  if (cociente_x == cociente_y &&
+                      mismo_cuadrante(puntos[i], puntos[j], puntos[k]))
+                    derrotados.push_back(k);
+                } else {
+                  bool al_vertical = (x_k == x_i && x_k == x_j);
+                  bool al_horizontal = (y_k == y_i && y_k == y_j);
+                  if ((al_vertical || al_horizontal) &&
+                      mismo_cuadrante(puntos[i], puntos[j], puntos[k]))
+                    derrotados.push_back(k);
+                }
+              }
+            }
+            // Eliminamos de la lista a los elementos cubiertos por la semirrecta, y llamamos a la funcion recursivamente para cubrir al resto de los puntos.
+            sucesor.Matar(derrotados);
+            backtracking(sucesor, s+1);
+            // Si el mejor = s+1 no vale la pena seguir iterando, porque cualquier solucion que encontremos va a ser a lo sumo tan buena como la que tenemos.
+            if (mejor == s+1) return;
+          }
+        }
+      }
+    }
+  }
+}
+\end{lstlisting}

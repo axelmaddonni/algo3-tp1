@@ -4,11 +4,13 @@
 #include <ctime>
 #include <chrono>
 
-std::vector<int> solve(std::vector<std::pair<int, int>> puntos, int t) {
+using namespace std;
+
+vector<int> solve(vector<pair<int, int>> puntos, int t) {
   int n = puntos.size();
   int i = 0;  // a quien le disparo
   int j = 0;  // primero a matar
-  std::vector<int> res;
+  vector<int> res;
   while (j < n) {
     i = j;		
     // Elijo al ultimo el elemento que sirve para abarcar todos hasta el primero.
